@@ -777,7 +777,7 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.6 }
   <div class="toolbar">
     <div class="search-wrap">
       <span class="search-icon">⌕</span>
-      <input id="search" type="text" placeholder="Buscar tag, área, ID, operador...">
+      <input id="search" type="text" placeholder="Buscar tag, área, ID, solicitante...">
     </div>
 
     <button class="filter-pill on-all" data-f="ALL">TODOS</button>
@@ -807,7 +807,8 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.6 }
           <th data-col="tipo">TIPO</th>
           <th data-col="valor">VALOR</th>
           <th data-col="estado">ESTADO ↕</th>
-          <th data-col="operador">OPERADOR ↕</th>
+          <th data-col="operador">SOLICITANTE ↕</th>
+          <th data-col="responsable">RESPONSABLE ↕</th>
           <th data-col="ts">FORZADO ↕</th>
           <th data-col="ts_lib">LIBERADO</th>
           <th data-col="ot">OT</th>
@@ -952,17 +953,14 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.6 }
           <label>Área / Unidad *</label>
           <select id="f-area">
             <option value="">— Seleccionar —</option>
-            <option>Compresión</option>
-            <option>Separación</option>
-            <option>Inyección</option>
-            <option>Tuberías y Ductos</option>
-            <option>Utilities</option>
-            <option>ESD / SIS</option>
-            <option>Fire & Gas</option>
-            <option>Instrumentación General</option>
-            <option>Eléctrico</option>
-            <option>Procesos</option>
-            <option>Almacenamiento</option>
+            <option>Chancado</option>
+            <option>Molienda</option>
+            <option>Flotación</option>
+            <option>Planta Molibdeno</option>
+            <option>Relaves y Concentraducto</option>
+            <option>DRR</option>
+            <option>Muelle</option>
+            <option>SIAM</option>
             <option>Otro</option>
           </select>
         </div>
@@ -970,14 +968,14 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.6 }
           <label>Disciplina *</label>
           <select id="f-disciplina">
             <option value="">— Seleccionar —</option>
+            <option>Electricidad</option>
             <option>Instrumentación</option>
-            <option>Eléctrico</option>
-            <option>Mecánico</option>
-            <option>Procesos</option>
-            <option>Control</option>
-            <option>SIS / Safety</option>
-            <option>Telecomunicaciones</option>
-            <option>Civil</option>
+            <option>DCS</option>
+            <option>Mecánicos</option>
+            <option>Metalurgia</option>
+            <option>GP</option>
+            <option>Operaciones</option>
+            <option>Planificación</option>
             <option>Otro</option>
           </select>
         </div>
@@ -1013,8 +1011,12 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.6 }
           <input id="f-vorig" type="text" placeholder="0 / AUTO">
         </div>
         <div class="field">
-          <label>Operador / Técnico *</label>
-          <input id="f-oper" type="text" placeholder="Nombre">
+          <label>Solicitante *</label>
+          <input id="f-oper" type="text" placeholder="Nombre del solicitante">
+        </div>
+        <div class="field">
+          <label>Responsable *</label>
+          <input id="f-responsable" type="text" placeholder="Quien autoriza y normaliza el forzado">
         </div>
         <div class="field">
           <label>Fecha / Hora forzado</label>
@@ -1156,7 +1158,7 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.6 }
 <!-- ══════════════════════════════════════════════════════ -->
 <script>
 // ── Config ─────────────────────────────────────────────
-const EDITOR_PIN = '1234'; // Cambia este PIN
+const EDITOR_PIN = 'Dcs.2026';
 
 // ── State ──────────────────────────────────────────────
 let records   = [];
@@ -1286,6 +1288,7 @@ function openModal(id = null){
     document.getElementById('f-valor').value     = r.valor || '';
     document.getElementById('f-vorig').value     = r.vorig || '';
     document.getElementById('f-oper').value      = r.operador || '';
+    document.getElementById('f-responsable').value = r.responsable || '';
     document.getElementById('f-ts').value        = r.ts || '';
     document.getElementById('f-ot').value        = r.ot || '';
     document.getElementById('f-lib-quien').value = r.lib_quien || '';
@@ -1317,7 +1320,7 @@ document.querySelectorAll('.est-btn').forEach(b => {
 });
 
 function clearForm(){
-  ['f-id','f-tag','f-desc','f-causa','f-valor','f-vorig','f-oper','f-ot',
+  ['f-id','f-tag','f-desc','f-causa','f-valor','f-vorig','f-oper','f-responsable','f-ot',
    'f-lib-quien','f-lib-ts','f-lib-obs'].forEach(id => {
     const el = document.getElementById(id); if(el) el.value = '';
   });
@@ -1332,8 +1335,10 @@ function clearForm(){
 async function saveRecord(){
   const tag  = document.getElementById('f-tag').value.trim();
   const oper = document.getElementById('f-oper').value.trim();
+  const resp = document.getElementById('f-responsable').value.trim();
   if(!tag){ toast('TAG es obligatorio', 'var(--red)'); return }
-  if(!oper){ toast('Operador es obligatorio', 'var(--red)'); return }
+  if(!oper){ toast('Solicitante es obligatorio', 'var(--red)'); return }
+  if(!resp){ toast('Responsable es obligatorio', 'var(--red)'); return }
 
   const data = {
     id_registro: document.getElementById('f-id').value.trim(),
@@ -1346,6 +1351,7 @@ async function saveRecord(){
     valor:       document.getElementById('f-valor').value.trim(),
     vorig:       document.getElementById('f-vorig').value.trim(),
     operador:    oper,
+    responsable: resp,
     estado:      selectedEstado,
     ts:          document.getElementById('f-ts').value,
     ot:          document.getElementById('f-ot').value.trim(),
@@ -1443,7 +1449,7 @@ document.querySelectorAll('th[data-col]').forEach(th => {
 function render(){
   filtered = records.filter(r => {
     const ms = filterF==='ALL' || r.estado===filterF;
-    const mq = !searchQ || [r.tag,r.desc,r.area,r.operador,r.ot,r.id_registro,r.disciplina]
+    const mq = !searchQ || [r.tag,r.desc,r.area,r.operador,r.responsable,r.ot,r.id_registro,r.disciplina]
       .join(' ').toLowerCase().includes(searchQ);
     return ms && mq;
   });
@@ -1490,6 +1496,7 @@ function render(){
       <td style="font-size:11px">${r.valor||'—'}</td>
       <td><span class="badge ${bc}">${r.estado}</span></td>
       <td style="font-size:11px">${r.operador||'—'}</td>
+      <td style="font-size:11px;color:var(--cyan)">${r.responsable||'—'}</td>
       <td class="td-small">${fmtTs(r.ts)}</td>
       <td class="td-small" style="${r.lib_quien?'color:var(--green)':''}">${r.lib_quien ? fmtTs(r.lib_ts)+'<br><span style="color:var(--text2)">'+r.lib_quien+'</span>' : '—'}</td>
       <td class="td-small">${r.ot||'—'}</td>
@@ -1576,10 +1583,10 @@ const expData = () => filtered.length ? filtered : records;
 
 function exportCSV(){
   const cols = ['ID','Tag','Descripción','Área','Disciplina','Tipo','Valor Forzado',
-    'Valor Original','Estado','Operador','Fecha Forzado','OT','Libera','Fecha Liberación','Obs. Liberación','Causa'];
+    'Valor Original','Estado','Solicitante','Responsable','Fecha Forzado','OT','Libera','Fecha Liberación','Obs. Liberación','Causa'];
   const rows = expData().map(r => [
     r.id_registro,r.tag,r.desc,r.area,r.disciplina,r.tipo,r.valor,r.vorig,
-    r.estado,r.operador,r.ts,r.ot,r.lib_quien,r.lib_ts,r.lib_obs,r.causa
+    r.estado,r.operador,r.responsable,r.ts,r.ot,r.lib_quien,r.lib_ts,r.lib_obs,r.causa
   ].map(v => `"${(v||'').replace(/"/g,'""')}"`).join(','));
   dl(`forzados_${new Date().toISOString().slice(0,10)}.csv`,
     [cols.join(','), ...rows].join('\r\n'), 'text/csv;charset=utf-8');
@@ -1596,7 +1603,7 @@ function exportTXT(){
   const lines = expData().map((r,i) =>
     `[${i+1}] ${r.tag} — ${r.estado}\n` +
     `    Área: ${r.area||'—'} | Disciplina: ${r.disciplina||'—'}\n` +
-    `    Operador: ${r.operador||'—'} | Forzado: ${r.ts||'—'}\n` +
+    `    Solicitante: ${r.operador||'—'} | Responsable: ${r.responsable||'—'} | Forzado: ${r.ts||'—'}\n` +
     (r.lib_quien ? `    Liberado por: ${r.lib_quien} | ${r.lib_ts||'—'}\n` : '') +
     (r.causa ? `    Causa: ${r.causa}\n` : '')
   ).join('\n');
@@ -1608,7 +1615,7 @@ function exportHTML(){
   const rows = expData().map(r =>
     `<tr><td>${r.id_registro||''}</td><td><b>${r.tag}</b></td><td>${r.desc||''}</td>
     <td>${r.area||''}</td><td>${r.disciplina||''}</td>
-    <td>${r.estado}</td><td>${r.operador||''}</td><td>${(r.ts||'').replace('T',' ')}</td>
+    <td>${r.estado}</td><td>${r.operador||''}</td><td>${r.responsable||''}</td><td>${(r.ts||'').replace('T',' ')}</td>
     <td>${r.lib_quien||''}</td><td>${(r.lib_ts||'').replace('T',' ')}</td><td>${r.ot||''}</td></tr>`
   ).join('');
   const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
@@ -1622,7 +1629,7 @@ function exportHTML(){
   <body><h1>BITÁCORA DE FORZADOS — DCS</h1>
   <p>Generado: ${new Date().toLocaleString('es-CL')} | Total: ${expData().length} registros</p>
   <table><thead><tr><th>ID</th><th>Tag</th><th>Descripción</th><th>Área</th><th>Disciplina</th>
-  <th>Estado</th><th>Operador</th><th>Forzado</th><th>Libera</th><th>F.Liberación</th><th>OT</th>
+  <th>Estado</th><th>Solicitante</th><th>Responsable</th><th>Forzado</th><th>Libera</th><th>F.Liberación</th><th>OT</th>
   </tr></thead><tbody>${rows}</tbody></table></body></html>`;
   dl(`reporte_forzados_${new Date().toISOString().slice(0,10)}.html`, html, 'text/html');
   document.getElementById('modal-export').classList.remove('open');
