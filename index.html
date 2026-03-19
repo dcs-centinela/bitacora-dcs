@@ -883,7 +883,7 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.6 }
   <div class="toolbar">
     <div class="search-wrap">
       <span class="search-icon">⌕</span>
-      <input id="search" type="text" placeholder="Buscar tag, área, ID, solicitante...">
+      <input id="search" type="text" placeholder="Buscar tag, área, ID, equipo...">
     </div>
 
     <button class="filter-pill on-all" data-f="ALL">TODOS</button>
@@ -917,7 +917,7 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.6 }
           <th data-col="responsable">RESPONSABLE ↕</th>
           <th data-col="ts">FORZADO ↕</th>
           <th data-col="ts_lib">LIBERADO</th>
-          <th data-col="ot">OT</th>
+          <th data-col="equipo">EQUIPO</th>
           <th id="col-acc" style="display:none">ACC.</th>
         </tr>
       </thead>
@@ -1035,8 +1035,8 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.6 }
           <input id="f-tag" type="text" placeholder="P-1234 / XV-203A" autocomplete="off">
         </div>
         <div class="field">
-          <label>OT / PT</label>
-          <input id="f-ot" type="text" placeholder="OT-001">
+          <label>Equipo Asociado</label>
+          <input id="f-equipo" type="text" placeholder="TAG equipo / descripción">
         </div>
       </div>
       <div class="form-grid fg-2" style="margin-top:10px">
@@ -1527,7 +1527,7 @@ function openModal(id = null){
     document.getElementById('f-oper').value      = r.operador || '';
     document.getElementById('f-responsable').value = r.responsable || '';
     document.getElementById('f-ts').value        = r.ts || '';
-    document.getElementById('f-ot').value        = r.ot || '';
+    document.getElementById('f-equipo').value        = r.equipo || '';
     document.getElementById('f-lib-quien').value = r.lib_quien || '';
     document.getElementById('f-lib-ts').value    = r.lib_ts || '';
     document.getElementById('f-lib-obs').value   = r.lib_obs || '';
@@ -1557,7 +1557,7 @@ document.querySelectorAll('.est-btn').forEach(b => {
 });
 
 function clearForm(){
-  ['f-id','f-tag','f-desc','f-causa','f-valor','f-vorig','f-oper','f-responsable','f-ot',
+  ['f-id','f-tag','f-desc','f-causa','f-valor','f-vorig','f-oper','f-responsable','f-equipo',
    'f-lib-quien','f-lib-ts','f-lib-obs'].forEach(id => {
     const el = document.getElementById(id); if(el) el.value = '';
   });
@@ -1591,7 +1591,7 @@ async function saveRecord(){
     responsable: resp,
     estado:      selectedEstado,
     ts:          document.getElementById('f-ts').value,
-    ot:          document.getElementById('f-ot').value.trim(),
+    equipo:      document.getElementById('f-equipo').value.trim(),
     lib_quien:   document.getElementById('f-lib-quien').value.trim(),
     lib_ts:      document.getElementById('f-lib-ts').value,
     lib_obs:     document.getElementById('f-lib-obs').value.trim(),
@@ -1686,7 +1686,7 @@ document.querySelectorAll('th[data-col]').forEach(th => {
 function render(){
   filtered = records.filter(r => {
     const ms = filterF==='ALL' || r.estado===filterF;
-    const mq = !searchQ || [r.tag,r.desc,r.area,r.operador,r.responsable,r.ot,r.id_registro,r.disciplina]
+    const mq = !searchQ || [r.tag,r.desc,r.area,r.operador,r.responsable,r.equipo,r.id_registro,r.disciplina]
       .join(' ').toLowerCase().includes(searchQ);
     return ms && mq;
   });
@@ -1736,7 +1736,7 @@ function render(){
       <td style="font-size:11px;color:var(--cyan)">${r.responsable||'—'}</td>
       <td class="td-small">${fmtTs(r.ts)}</td>
       <td class="td-small" style="${r.lib_quien?'color:var(--green)':''}">${r.lib_quien ? fmtTs(r.lib_ts)+'<br><span style="color:var(--text2)">'+r.lib_quien+'</span>' : '—'}</td>
-      <td class="td-small">${r.ot||'—'}</td>
+      <td class="td-small">${r.equipo||'—'}</td>
       ${accCol}
     </tr>`;
   }).join('');
@@ -1820,10 +1820,10 @@ const expData = () => filtered.length ? filtered : records;
 
 function exportCSV(){
   const cols = ['ID','Tag','Descripción','Área','Disciplina','Tipo','Valor Forzado',
-    'Valor Original','Estado','Solicitante','Responsable','Fecha Forzado','OT','Libera','Fecha Liberación','Obs. Liberación','Causa'];
+    'Valor Original','Estado','Solicitante','Responsable','Fecha Forzado','Equipo Asociado','Libera','Fecha Liberación','Obs. Liberación','Causa'];
   const rows = expData().map(r => [
     r.id_registro,r.tag,r.desc,r.area,r.disciplina,r.tipo,r.valor,r.vorig,
-    r.estado,r.operador,r.responsable,r.ts,r.ot,r.lib_quien,r.lib_ts,r.lib_obs,r.causa
+    r.estado,r.operador,r.responsable,r.ts,r.equipo,r.lib_quien,r.lib_ts,r.lib_obs,r.causa
   ].map(v => `"${(v||'').replace(/"/g,'""')}"`).join(','));
   dl(`forzados_${new Date().toISOString().slice(0,10)}.csv`,
     [cols.join(','), ...rows].join('\r\n'), 'text/csv;charset=utf-8');
@@ -1853,7 +1853,7 @@ function exportHTML(){
     `<tr><td>${r.id_registro||''}</td><td><b>${r.tag}</b></td><td>${r.desc||''}</td>
     <td>${r.area||''}</td><td>${r.disciplina||''}</td>
     <td>${r.estado}</td><td>${r.operador||''}</td><td>${r.responsable||''}</td><td>${(r.ts||'').replace('T',' ')}</td>
-    <td>${r.lib_quien||''}</td><td>${(r.lib_ts||'').replace('T',' ')}</td><td>${r.ot||''}</td></tr>`
+    <td>${r.lib_quien||''}</td><td>${(r.lib_ts||'').replace('T',' ')}</td><td>${r.equipo||''}</td></tr>`
   ).join('');
   const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
   <title>Bitácora DCS — ${new Date().toLocaleDateString('es-CL')}</title>
@@ -1866,7 +1866,7 @@ function exportHTML(){
   <body><h1>BITÁCORA DE FORZADOS — DCS</h1>
   <p>Generado: ${new Date().toLocaleString('es-CL')} | Total: ${expData().length} registros</p>
   <table><thead><tr><th>ID</th><th>Tag</th><th>Descripción</th><th>Área</th><th>Disciplina</th>
-  <th>Estado</th><th>Solicitante</th><th>Responsable</th><th>Forzado</th><th>Libera</th><th>F.Liberación</th><th>OT</th>
+  <th>Estado</th><th>Solicitante</th><th>Responsable</th><th>Forzado</th><th>Libera</th><th>F.Liberación</th><th>EQUIPO</th>
   </tr></thead><tbody>${rows}</tbody></table></body></html>`;
   dl(`reporte_forzados_${new Date().toISOString().slice(0,10)}.html`, html, 'text/html');
   document.getElementById('modal-export').classList.remove('open');
