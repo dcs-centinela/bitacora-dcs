@@ -42,24 +42,24 @@
 
 <style>
 :root {
-  --bg:        #080b10;
-  --surface:   #0e1318;
-  --surface2:  #131a22;
-  --border:    #1c2530;
-  --border2:   #243040;
+  --bg:        #f4f6f9;
+  --surface:   #ffffff;
+  --surface2:  #f0f4f8;
+  --border:    #dde3ea;
+  --border2:   #c8d2dc;
   --amber:     #f0a500;
-  --amber-d:   #7a5200;
-  --amber-g:   rgba(240,165,0,.08);
-  --green:     #27c97a;
-  --green-g:   rgba(39,201,122,.08);
-  --red:       #e05252;
-  --red-g:     rgba(224,82,82,.08);
-  --blue:      #4a9eff;
-  --blue-g:    rgba(74,158,255,.08);
-  --cyan:      #00d4c8;
-  --text:      #b8c8d8;
-  --text2:     #6a8090;
-  --white:     #e8f0f8;
+  --amber-d:   #c47e00;
+  --amber-g:   rgba(240,165,0,.10);
+  --green:     #1a9e5c;
+  --green-g:   rgba(26,158,92,.08);
+  --red:       #d93535;
+  --red-g:     rgba(217,53,53,.08);
+  --blue:      #1a7db5;
+  --blue-g:    rgba(26,125,181,.08);
+  --cyan:      #2196b8;
+  --text:      #2c3e50;
+  --text2:     #7a8fa0;
+  --white:     #1a2a3a;
   --mono:      'Share Tech Mono', monospace;
   --sans:      'Rajdhani', sans-serif;
   --radius:    3px;
@@ -80,12 +80,12 @@ body {
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-track{background:var(--bg)}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
-::-webkit-scrollbar-thumb:hover{background:var(--amber-d)}
+::-webkit-scrollbar-thumb:hover{background:var(--blue)}
 
 /* ── Header ─────────────────────────────────────── */
 header {
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
+  background: var(--blue);
+  border-bottom: 3px solid var(--amber);
   padding: 0 24px;
   height: 56px;
   display: flex;
@@ -94,7 +94,7 @@ header {
   position: sticky;
   top: 0;
   z-index: 200;
-  box-shadow: 0 2px 20px rgba(0,0,0,.4);
+  box-shadow: 0 2px 12px rgba(26,125,181,.25);
 }
 .hdr-left { display:flex; align-items:center; gap:16px }
 .logo {
@@ -106,20 +106,20 @@ header {
   width:28px; height:28px;
 }
 .logo-grid span {
-  background: var(--amber);
+  background: #ffffff;
   display:block; border-radius:1px;
   animation: pulse-cell 3s infinite;
 }
-.logo-grid span:nth-child(2){ background:var(--amber-d); animation-delay:.4s }
-.logo-grid span:nth-child(3){ background:var(--amber-d); animation-delay:.8s }
-@keyframes pulse-cell{0%,100%{opacity:1}50%{opacity:.5}}
+.logo-grid span:nth-child(2){ background:var(--amber); animation-delay:.4s }
+.logo-grid span:nth-child(3){ background:var(--amber); animation-delay:.8s }
+@keyframes pulse-cell{0%,100%{opacity:1}50%{opacity:.6}}
 
 .logo-text {
   font-family: var(--sans);
   font-size: 22px;
   font-weight: 700;
   letter-spacing: 4px;
-  color: var(--white);
+  color: #ffffff;
 }
 .logo-text em { color: var(--amber); font-style:normal }
 
@@ -128,7 +128,7 @@ header {
   padding: 8px 16px;
   background: transparent;
   border: none;
-  color: var(--text2);
+  color: rgba(255,255,255,.75);
   font-family: var(--sans);
   font-size: 14px;
   font-weight: 600;
@@ -138,10 +138,10 @@ header {
   transition: all .15s;
   position: relative;
 }
-.nav-btn:hover { color: var(--white); background: var(--surface2) }
+.nav-btn:hover { color: #fff; background: rgba(255,255,255,.12) }
 .nav-btn.active {
-  color: var(--amber);
-  background: var(--amber-g);
+  color: #fff;
+  background: rgba(255,255,255,.15);
 }
 .nav-btn.active::after {
   content:'';
@@ -152,8 +152,9 @@ header {
 .hdr-right { display:flex; align-items:center; gap:16px }
 #clock {
   font-size: 14px;
-  color: var(--amber);
+  color: #fff;
   letter-spacing: 2px;
+  opacity: .9;
 }
 .role-badge {
   padding: 4px 12px;
@@ -165,14 +166,14 @@ header {
   cursor: pointer;
 }
 .role-badge.editor {
-  background: var(--amber-g);
+  background: var(--amber);
   border: 1px solid var(--amber-d);
-  color: var(--amber);
+  color: #000;
 }
 .role-badge.viewer {
-  background: var(--blue-g);
-  border: 1px solid #1a3e6e;
-  color: var(--blue);
+  background: rgba(255,255,255,.2);
+  border: 1px solid rgba(255,255,255,.4);
+  color: #fff;
 }
 .conn-indicator {
   width: 8px; height: 8px;
@@ -180,7 +181,7 @@ header {
   background: var(--red);
   transition: background .3s;
 }
-.conn-indicator.online { background: var(--green) }
+.conn-indicator.online { background: #6ee6a0 }
 
 /* ── Pages ───────────────────────────────────────── */
 .page { display:none; height:calc(100vh - 56px) }
@@ -194,7 +195,7 @@ header {
 
 /* toolbar */
 .toolbar {
-  background: var(--surface);
+  background: #ffffff;
   border-bottom: 1px solid var(--border);
   padding: 10px 20px;
   display: flex;
@@ -234,7 +235,7 @@ header {
 .btn-export {
   padding: 6px 14px;
   background: transparent;
-  border: 1px solid var(--border2);
+  border: 1px solid var(--border);
   color: var(--cyan);
   font-family: var(--sans);
   font-size: 13px;
@@ -268,19 +269,19 @@ header {
 table { width:100%; border-collapse:collapse }
 thead { position:sticky; top:0; z-index:10 }
 th {
-  background: #090d12;
-  border-bottom: 1px solid var(--border);
+  background: #e8f0f8;
+  border-bottom: 2px solid var(--blue);
   padding: 8px 12px;
   text-align: left;
   font-size: 10px;
   letter-spacing: 1.5px;
-  color: var(--text2);
+  color: var(--blue);
   text-transform: uppercase;
   white-space: nowrap;
   cursor: pointer;
   user-select: none;
   font-family: var(--sans);
-  font-weight: 600;
+  font-weight: 700;
 }
 th:hover { color: var(--amber) }
 th.sorted { color: var(--amber) }
@@ -289,7 +290,7 @@ tbody tr {
   border-bottom: 1px solid var(--border);
   transition: background .1s;
 }
-tbody tr:hover { background: rgba(255,255,255,.02) }
+tbody tr:hover { background: rgba(26,125,181,.04) }
 tbody tr.r-forzado  { border-left: 3px solid var(--amber) }
 tbody tr.r-liberado { border-left: 3px solid var(--green) }
 tbody tr.r-pendiente{ border-left: 3px solid var(--blue)  }
@@ -300,7 +301,7 @@ td {
   font-size: 12px;
 }
 .td-id    { color:var(--text2); font-size:11px }
-.td-tag   { color:var(--white); font-weight:400 }
+.td-tag   { color:var(--blue); font-weight:600 }
 .td-small { color:var(--text2); font-size:11px; white-space:nowrap }
 
 .badge {
@@ -313,16 +314,16 @@ td {
   font-family: var(--sans);
   font-weight: 600;
 }
-.b-forzado  { background:var(--amber-g); color:var(--amber); border:1px solid var(--amber-d) }
-.b-liberado { background:var(--green-g); color:var(--green); border:1px solid #0f4a2a }
-.b-pendiente{ background:var(--blue-g);  color:var(--blue);  border:1px solid #1a3e6e }
+.b-forzado  { background:#fff3e0; color:#c47e00; border:1px solid #f0c060 }
+.b-liberado { background:#e6f7ee; color:#1a7a4a; border:1px solid #8ed4ae }
+.b-pendiente{ background:#e6f2fa; color:#1a6090; border:1px solid #80bce0 }
 
 .act-btn {
   background:transparent; border:none; cursor:pointer;
   padding:3px 6px; border-radius:2px; font-size:13px;
   transition: background .1s;
 }
-.act-btn:hover { background: rgba(255,255,255,.06) }
+.act-btn:hover { background: rgba(26,125,181,.08) }
 
 .empty-state {
   text-align:center; padding:80px 20px; color:var(--text2)
@@ -333,22 +334,22 @@ td {
 /* ── MODAL ───────────────────────────────────────── */
 .overlay {
   position:fixed; inset:0;
-  background:rgba(0,0,0,.75);
+  background:rgba(26,42,58,.6);
   display:none; align-items:center; justify-content:center;
   z-index:500; padding:16px;
 }
 .overlay.open { display:flex }
 
 .modal {
-  background: var(--surface2);
-  border: 1px solid var(--border2);
-  border-top: 2px solid var(--amber);
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--blue);
   width: 100%;
   max-width: 760px;
   max-height: 90vh;
   overflow-y: auto;
   border-radius: var(--radius);
-  box-shadow: 0 20px 60px rgba(0,0,0,.6);
+  box-shadow: 0 8px 40px rgba(26,125,181,.18);
 }
 .modal-header {
   padding: 16px 24px;
@@ -356,13 +357,14 @@ td {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  background: var(--blue);
 }
 .modal-title {
   font-family: var(--sans);
   font-size: 18px;
   font-weight: 700;
   letter-spacing: 3px;
-  color: var(--white);
+  color: #fff;
 }
 .modal-title span { color: var(--amber) }
 .modal-close {
@@ -391,7 +393,7 @@ td {
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 2px;
-  color: var(--amber);
+  color: var(--blue);
   text-transform: uppercase;
   margin-bottom: 12px;
   padding-bottom: 6px;
@@ -417,8 +419,8 @@ td {
 }
 input, select, textarea {
   width: 100%;
-  background: rgba(0,0,0,.3);
-  border: 1px solid var(--border2);
+  background: #ffffff;
+  border: 1px solid var(--border);
   color: var(--text);
   font-family: var(--mono);
   font-size: 12px;
@@ -428,18 +430,18 @@ input, select, textarea {
   transition: border-color .15s, box-shadow .15s;
 }
 input:focus, select:focus, textarea:focus {
-  border-color: var(--amber);
-  box-shadow: 0 0 0 2px var(--amber-g);
+  border-color: var(--blue);
+  box-shadow: 0 0 0 2px rgba(26,125,181,.12);
 }
-select option { background: #0e1318 }
+select option { background: #ffffff; color: var(--text) }
 textarea { resize:vertical; min-height:60px }
 input::placeholder, textarea::placeholder { color:var(--text2); opacity:.6 }
 
 .estado-group { display:flex; gap:8px }
 .est-btn {
   flex:1; padding:8px 6px;
-  border:1px solid var(--border2);
-  background:transparent;
+  border:1px solid var(--border);
+  background:#fff;
   color:var(--text2);
   font-family:var(--sans);
   font-size:12px;
@@ -450,43 +452,43 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.6 }
   transition:all .15s;
   text-align:center;
 }
-.est-btn.sel-forzado  { border-color:var(--amber); background:var(--amber-g); color:var(--amber) }
-.est-btn.sel-liberado { border-color:var(--green); background:var(--green-g); color:var(--green) }
-.est-btn.sel-pendiente{ border-color:var(--blue);  background:var(--blue-g);  color:var(--blue)  }
+.est-btn.sel-forzado  { border-color:var(--amber); background:#fff8e6; color:var(--amber-d) }
+.est-btn.sel-liberado { border-color:var(--green); background:#e8f7ef; color:#1a7a4a }
+.est-btn.sel-pendiente{ border-color:var(--blue);  background:#e6f2fa; color:var(--blue)  }
 
 /* liberation section */
 .lib-section {
-  background: var(--green-g);
-  border: 1px solid #0f4a2a;
+  background: #edf7f2;
+  border: 1px solid #8ed4ae;
   border-radius: var(--radius);
   padding: 14px;
   margin-top: 4px;
 }
-.lib-section .section-label { color: var(--green); border-color: #0f4a2a }
+.lib-section .section-label { color: #1a7a4a; border-color: #8ed4ae }
 
 /* Buttons */
 .btn-primary {
   padding: 9px 22px;
-  background: var(--amber);
-  border: none; color: #000;
+  background: var(--blue);
+  border: none; color: #fff;
   font-family: var(--sans); font-size: 14px; font-weight: 700;
   letter-spacing: 2px; cursor: pointer; border-radius: var(--radius);
   transition: all .15s;
 }
-.btn-primary:hover { background:#ffc040 }
+.btn-primary:hover { background:#1560a0 }
 .btn-secondary {
   padding: 9px 18px;
   background: transparent;
-  border: 1px solid var(--border2); color: var(--text2);
+  border: 1px solid var(--border); color: var(--text2);
   font-family: var(--sans); font-size: 14px;
   cursor: pointer; border-radius: var(--radius);
   transition: all .15s;
 }
-.btn-secondary:hover { border-color:var(--text); color:var(--white) }
+.btn-secondary:hover { border-color:var(--blue); color:var(--blue) }
 .btn-danger {
   padding: 9px 18px;
-  background: var(--red-g);
-  border: 1px solid #6a1a1a; color: var(--red);
+  background: #fef0f0;
+  border: 1px solid #f0a0a0; color: var(--red);
   font-family: var(--sans); font-size: 14px; font-weight: 600;
   cursor: pointer; border-radius: var(--radius);
 }
@@ -503,7 +505,7 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.6 }
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 3px;
-  color: var(--amber);
+  color: var(--blue);
   text-transform: uppercase;
   margin-bottom: 16px;
 }
@@ -514,7 +516,7 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.6 }
   gap: 14px;
 }
 .kpi-card {
-  background: var(--surface);
+  background: #ffffff;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 18px 20px;
@@ -543,7 +545,7 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.6 }
   font-size: 36px;
   font-family: var(--sans);
   font-weight: 700;
-  color: var(--white);
+  color: var(--blue);
   line-height: 1;
 }
 .kpi-card.kf .kpi-value { color: var(--amber) }
@@ -558,7 +560,7 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.6 }
   gap: 14px;
 }
 .dash-card {
-  background: var(--surface);
+  background: #ffffff;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 20px;
@@ -642,8 +644,8 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.6 }
   margin-bottom: 20px;
 }
 .export-card {
-  background: var(--surface);
-  border: 1px solid var(--border2);
+  background: #ffffff;
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 16px;
   cursor: pointer;
@@ -657,7 +659,7 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.6 }
   font-size: 14px;
   font-weight: 600;
   letter-spacing: 1px;
-  color: var(--white);
+  color: var(--blue);
   margin-bottom: 4px;
 }
 .export-desc { font-size:11px; color:var(--text2) }
@@ -667,7 +669,7 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.6 }
 .role-options { display:flex; flex-direction:column; gap:10px; margin:12px 0 }
 .role-option {
   padding: 14px;
-  border: 1px solid var(--border2);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   cursor: pointer;
   transition: all .15s;
@@ -698,7 +700,7 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.6 }
 /* ── LOADING ─────────────────────────────────────── */
 #loading-screen {
   position:fixed; inset:0;
-  background:var(--bg);
+  background:#ffffff;
   display:flex; align-items:center; justify-content:center;
   flex-direction:column; gap:16px;
   z-index:1000;
@@ -707,17 +709,17 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.6 }
 .loading-logo {
   font-family:var(--sans);
   font-size:32px; font-weight:700; letter-spacing:6px;
-  color:var(--white);
+  color:var(--blue);
 }
 .loading-logo em { color:var(--amber); font-style:normal }
 .loading-bar {
-  width:200px; height:2px;
+  width:200px; height:3px;
   background:var(--border);
   border-radius:1px; overflow:hidden;
 }
 .loading-fill {
   height:100%; width:0%;
-  background:var(--amber);
+  background:var(--blue);
   border-radius:1px;
   animation:load-anim 1.5s ease forwards;
 }
@@ -730,9 +732,9 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.6 }
   top: 56px; right: 0;
   width: 420px;
   height: calc(100vh - 56px);
-  background: var(--surface2);
+  background: #ffffff;
   border-left: 1px solid var(--border2);
-  border-top: 2px solid var(--amber);
+  border-top: 3px solid var(--blue);
   z-index: 300;
   display: flex;
   flex-direction: column;
@@ -749,7 +751,7 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.6 }
 }
 .config-title {
   font-family: var(--sans); font-size: 16px; font-weight: 700;
-  letter-spacing: 3px; color: var(--amber);
+  letter-spacing: 3px; color: var(--blue);
 }
 .config-close {
   background: transparent; border: none; color: var(--text2);
@@ -864,6 +866,8 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.6 }
     <button class="cfg-tab" data-list="disciplinas">DISCIPLINAS</button>
     <button class="cfg-tab" data-list="responsables">RESPONSABLES</button>
     <button class="cfg-tab" data-list="tipos">TIPOS</button>
+    <button class="cfg-tab" data-list="liberadores">LIBERA</button>
+    <button class="cfg-tab" data-list="obs_lib">OBS. LIB.</button>
   </div>
   <div class="config-body">
     <div class="cfg-section-label" id="cfg-current-label">Solicitantes</div>
@@ -907,6 +911,7 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.6 }
         <tr>
           <th data-col="id_registro">ID</th>
           <th data-col="tag">TAG ↕</th>
+          <th data-col="equipo">EQUIPO ↕</th>
           <th data-col="desc">DESCRIPCIÓN</th>
           <th data-col="area">ÁREA ↕</th>
           <th data-col="disciplina">DISCIPLINA</th>
@@ -917,7 +922,6 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.6 }
           <th data-col="responsable">RESPONSABLE ↕</th>
           <th data-col="ts">FORZADO ↕</th>
           <th data-col="ts_lib">LIBERADO</th>
-          <th data-col="equipo">EQUIPO</th>
           <th id="col-acc" style="display:none">ACC.</th>
         </tr>
       </thead>
@@ -1113,7 +1117,9 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.6 }
         <div class="form-grid fg-3">
           <div class="field">
             <label>Quién libera</label>
-            <input id="f-lib-quien" type="text" placeholder="Nombre del responsable">
+            <select id="f-lib-quien">
+              <option value="">— Seleccionar —</option>
+            </select>
           </div>
           <div class="field">
             <label>Fecha / Hora liberación</label>
@@ -1121,7 +1127,9 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.6 }
           </div>
           <div class="field">
             <label>Observaciones de liberación</label>
-            <input id="f-lib-obs" type="text" placeholder="Notas al liberar...">
+            <select id="f-lib-obs">
+              <option value="">— Seleccionar —</option>
+            </select>
           </div>
         </div>
       </div>
@@ -1316,13 +1324,16 @@ const CFG_DEFAULTS = {
   areas: ['Chancado','Molienda','Flotación','Planta Molibdeno','Relaves y Concentraducto','DRR','Muelle','SIAM'],
   disciplinas: ['Electricidad','Instrumentación','DCS','Mecánicos','Metalurgia','GP','Operaciones','Planificación'],
   responsables: [],
-  tipos: ['AI','AO','DI','DO','Lazo PID','Setpoint','Permisivo','Enclavamiento']
+  tipos: ['AI','AO','DI','DO','Lazo PID','Setpoint','Permisivo','Enclavamiento'],
+  liberadores: [],
+  obs_lib: ['Normalizado sin novedad','Equipo reparado y funcional','Prueba completada','Mantenimiento finalizado','Proceso estabilizado','Otro']
 };
-let cfgLists = { ...CFG_DEFAULTS };
+let cfgLists = JSON.parse(JSON.stringify(CFG_DEFAULTS));
 let cfgActiveList = 'solicitantes';
 const CFG_LABELS = {
   solicitantes:'Solicitantes', areas:'Áreas', disciplinas:'Disciplinas',
-  responsables:'Responsables', tipos:'Tipos de señal'
+  responsables:'Responsables', tipos:'Tipos de señal',
+  liberadores:'Quién libera', obs_lib:'Observaciones de liberación'
 };
 
 function openConfig(){
@@ -1407,18 +1418,11 @@ function cfgDelete(idx){
 
 // Populate all form selects with config lists
 function populateFormSelects(){
-  const selMap = {
-    'f-area':       cfgLists.areas,
-    'f-disciplina': cfgLists.disciplinas,
-    'f-tipo':       cfgLists.tipos,
-    'f-oper':       null, // text input — convert to select
-    'f-responsable':null,
-  };
-  // Areas
   setSelectOptions('f-area', cfgLists.areas);
   setSelectOptions('f-disciplina', cfgLists.disciplinas);
   setSelectOptions('f-tipo', cfgLists.tipos);
-  // Convert text inputs to selects for solicitante and responsable
+  setSelectOptions('f-lib-quien', cfgLists.liberadores);
+  setSelectOptions('f-lib-obs', cfgLists.obs_lib);
   convertToSelect('f-oper', cfgLists.solicitantes, 'Seleccionar solicitante...');
   convertToSelect('f-responsable', cfgLists.responsables, 'Seleccionar responsable...');
 }
@@ -1430,6 +1434,20 @@ function setSelectOptions(id, list){
   sel.innerHTML = '<option value="">— Seleccionar —</option>' +
     list.map(v => `<option${v===current?' selected':''}>${v}</option>`).join('') +
     '<option value="__otro__">Otro...</option>';
+}
+
+function setSelectValue(id, val){
+  const sel = document.getElementById(id);
+  if(!sel) return;
+  if(sel.tagName === 'SELECT'){
+    // Add option if not present
+    if(val && ![...sel.options].find(o => o.value === val)){
+      sel.innerHTML += `<option value="${val}">${val}</option>`;
+    }
+    sel.value = val;
+  } else {
+    sel.value = val;
+  }
 }
 
 function convertToSelect(id, list, placeholder){
@@ -1527,10 +1545,11 @@ function openModal(id = null){
     document.getElementById('f-oper').value      = r.operador || '';
     document.getElementById('f-responsable').value = r.responsable || '';
     document.getElementById('f-ts').value        = r.ts || '';
-    document.getElementById('f-equipo').value        = r.equipo || '';
-    document.getElementById('f-lib-quien').value = r.lib_quien || '';
+    document.getElementById('f-equipo').value    = r.equipo || '';
+    // Liberation selects — add value dynamically if not in list
+    setSelectValue('f-lib-quien', r.lib_quien || '');
     document.getElementById('f-lib-ts').value    = r.lib_ts || '';
-    document.getElementById('f-lib-obs').value   = r.lib_obs || '';
+    setSelectValue('f-lib-obs', r.lib_obs || '');
     setEstado(r.estado || 'FORZADO');
   } else {
     clearForm();
@@ -1557,13 +1576,20 @@ document.querySelectorAll('.est-btn').forEach(b => {
 });
 
 function clearForm(){
-  ['f-id','f-tag','f-desc','f-causa','f-valor','f-vorig','f-oper','f-responsable','f-equipo',
-   'f-lib-quien','f-lib-ts','f-lib-obs'].forEach(id => {
+  ['f-id','f-tag','f-desc','f-causa','f-valor','f-vorig','f-equipo',
+   'f-lib-ts'].forEach(id => {
     const el = document.getElementById(id); if(el) el.value = '';
   });
   document.getElementById('f-area').value = '';
   document.getElementById('f-disciplina').value = '';
   document.getElementById('f-tipo').value = '';
+  document.getElementById('f-lib-quien').value = '';
+  document.getElementById('f-lib-obs').value = '';
+  // reset dynamic selects for solicitante/responsable
+  const fOper = document.getElementById('f-oper');
+  const fResp = document.getElementById('f-responsable');
+  if(fOper) fOper.value = '';
+  if(fResp) fResp.value = '';
   document.getElementById('f-ts').value = nowLocal();
   setEstado('FORZADO');
 }
@@ -1726,6 +1752,7 @@ function render(){
     return `<tr class="${rc}">
       <td class="td-id">${r.id_registro||'—'}</td>
       <td class="td-tag">${r.tag}</td>
+      <td style="font-size:11px;color:var(--text)">${r.equipo||'—'}</td>
       <td style="max-width:160px;font-size:11px;color:var(--text)" title="${r.desc||''}">${r.desc||'—'}</td>
       <td>${r.area||'—'}</td>
       <td style="color:var(--cyan);font-size:11px">${r.disciplina||'—'}</td>
@@ -1736,7 +1763,6 @@ function render(){
       <td style="font-size:11px;color:var(--cyan)">${r.responsable||'—'}</td>
       <td class="td-small">${fmtTs(r.ts)}</td>
       <td class="td-small" style="${r.lib_quien?'color:var(--green)':''}">${r.lib_quien ? fmtTs(r.lib_ts)+'<br><span style="color:var(--text2)">'+r.lib_quien+'</span>' : '—'}</td>
-      <td class="td-small">${r.equipo||'—'}</td>
       ${accCol}
     </tr>`;
   }).join('');
