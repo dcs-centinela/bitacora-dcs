@@ -494,147 +494,71 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.6 }
 }
 
 /* ── DASHBOARD PAGE ──────────────────────────────── */
-#page-dashboard {
-  flex-direction: column;
-  overflow-y: auto;
-  padding: 24px;
-  gap: 20px;
+#page-dashboard { overflow:hidden }
+.dash-shell {
+  display:flex; flex-direction:column; gap:8px;
+  padding:10px 16px; height:100%; overflow:hidden;
 }
-.dash-title {
-  font-family: var(--sans);
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 3px;
-  color: var(--blue);
-  text-transform: uppercase;
-  margin-bottom: 16px;
-}
-
-.kpi-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
+.dash-kpi-row {
+  display:grid; grid-template-columns:repeat(5,1fr); gap:8px; flex-shrink:0;
 }
 .kpi-card {
-  background: #ffffff;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 18px 20px;
-  position: relative;
-  overflow: hidden;
+  background:#ffffff; border:1px solid var(--border);
+  border-radius:var(--radius); padding:10px 14px;
+  position:relative; overflow:hidden;
 }
 .kpi-card::before {
-  content:'';
-  position:absolute; top:0; left:0; right:0;
-  height: 2px;
+  content:''; position:absolute; top:0; left:0; right:0; height:3px;
 }
-.kpi-card.kf::before { background: var(--amber) }
-.kpi-card.kl::before { background: var(--green) }
-.kpi-card.kp::before { background: var(--red) }
-.kpi-card.kt::before { background: var(--cyan) }
+.kpi-card.kf::before{background:var(--amber)}
+.kpi-card.kl::before{background:var(--green)}
+.kpi-card.kp::before{background:var(--red)}
+.kpi-card.kt::before{background:var(--cyan)}
 .kpi-label {
-  font-family: var(--sans);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 2px;
-  color: var(--text2);
-  text-transform: uppercase;
-  margin-bottom: 8px;
+  font-family:var(--sans); font-size:9px; font-weight:700;
+  letter-spacing:1.5px; color:var(--text2); text-transform:uppercase; margin-bottom:4px;
 }
 .kpi-value {
-  font-size: 36px;
-  font-family: var(--sans);
-  font-weight: 700;
-  color: var(--blue);
-  line-height: 1;
+  font-size:28px; font-family:var(--sans); font-weight:700; color:var(--blue); line-height:1;
 }
-.kpi-card.kf .kpi-value { color: var(--amber) }
-.kpi-card.kl .kpi-value { color: var(--green) }
-.kpi-card.kp .kpi-value { color: var(--red) }
-.kpi-card.kt .kpi-value { color: var(--cyan) }
-.kpi-sub { font-size:11px; color:var(--text2); margin-top:6px }
-
-.dash-grid-2 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
+.kpi-card.kf .kpi-value{color:var(--amber)}
+.kpi-card.kl .kpi-value{color:var(--green)}
+.kpi-card.kp .kpi-value{color:var(--red)}
+.kpi-card.kt .kpi-value{color:var(--cyan)}
+.kpi-sub{font-size:9px;color:var(--text2);margin-top:3px}
+.dash-main-row {
+  display:grid; grid-template-columns:2fr 1.4fr 0.8fr; gap:8px; flex:1; min-height:0;
+}
+.dash-bottom-row {
+  display:grid; grid-template-columns:repeat(4,1fr); gap:8px; flex:1; min-height:0;
 }
 .dash-card {
-  background: #ffffff;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 20px;
+  background:#ffffff; border:1px solid var(--border); border-radius:var(--radius);
+  padding:10px 14px; display:flex; flex-direction:column; overflow:hidden; min-height:0;
 }
 .dash-card-title {
-  font-family: var(--sans);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 2px;
-  color: var(--text2);
-  text-transform: uppercase;
-  margin-bottom: 16px;
+  font-family:var(--sans); font-size:11px; font-weight:700;
+  letter-spacing:1px; color:var(--blue); text-transform:uppercase;
+  margin-bottom:6px; flex-shrink:0;
 }
-
-/* bar chart */
-.bar-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 10px;
+.dash-time-controls{display:flex;gap:4px;margin-bottom:6px;flex-shrink:0}
+.time-btn {
+  padding:2px 10px; border:1px solid var(--border); background:transparent;
+  color:var(--text2); font-family:var(--mono); font-size:10px;
+  cursor:pointer; border-radius:2px; transition:all .15s;
 }
-.bar-label {
-  width: 110px;
-  font-size: 11px;
-  color: var(--text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  flex-shrink: 0;
-}
-.bar-track {
-  flex: 1;
-  background: var(--border);
-  height: 6px;
-  border-radius: 3px;
-  overflow: hidden;
-}
-.bar-fill {
-  height: 100%;
-  border-radius: 3px;
-  transition: width .4s ease;
-}
-.bar-count {
-  width: 28px;
-  text-align: right;
-  font-size: 11px;
-  color: var(--text2);
-  flex-shrink: 0;
-}
-
-/* donut chart */
-.donut-wrap {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  padding: 8px 0;
-}
-.donut-svg { flex-shrink: 0 }
-.donut-legend { display:flex; flex-direction:column; gap:10px }
-.legend-row { display:flex; align-items:center; gap:8px; font-size:12px }
-.legend-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0 }
-
-/* recent list */
-.recent-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--border);
-}
-.recent-item:last-child { border-bottom: none }
-.ri-tag { color: var(--white); font-size:12px; flex:1 }
-.ri-area { color:var(--text2); font-size:11px }
-.ri-ts { color:var(--text2); font-size:11px; white-space:nowrap }
+.time-btn.active{border-color:var(--blue);color:var(--blue);background:var(--blue-g)}
+canvas{flex:1;min-height:0;width:100% !important}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.bar-label{width:80px;font-size:10px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0}
+.bar-track{flex:1;background:var(--border);height:5px;border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;transition:width .4s ease}
+.bar-count{width:24px;text-align:right;font-size:10px;color:var(--text2);flex-shrink:0}
+.donut-wrap{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1}
+.donut-svg{flex-shrink:0}
+.donut-legend{display:flex;flex-direction:column;gap:5px}
+.legend-row{display:flex;align-items:center;gap:6px;font-size:11px}
+.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 
 /* ── EXPORT MODAL ────────────────────────────────── */
 .export-options {
@@ -935,54 +859,63 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.6 }
 <!-- ══════════════════════════════════════════════════════ -->
 <!--  PAGE: DASHBOARD                                       -->
 <!-- ══════════════════════════════════════════════════════ -->
-<div class="page" id="page-dashboard" style="flex-direction:column;overflow-y:auto;padding:24px;gap:20px">
+<div class="page" id="page-dashboard">
+<div class="dash-shell">
 
-  <div>
-    <div class="dash-title">▸ RESUMEN GENERAL</div>
-    <div class="kpi-grid">
-      <div class="kpi-card kf">
-        <div class="kpi-label">Forzados Activos</div>
-        <div class="kpi-value" id="d-forzados">0</div>
-        <div class="kpi-sub">en estado FORZADO</div>
-      </div>
-      <div class="kpi-card kl">
-        <div class="kpi-label">Liberados</div>
-        <div class="kpi-value" id="d-liberados">0</div>
-        <div class="kpi-sub">señales liberadas</div>
-      </div>
-      <div class="kpi-card kp">
-        <div class="kpi-label">Rechazados</div>
-        <div class="kpi-value" id="d-rechazados">0</div>
-        <div class="kpi-sub">solicitud rechazada</div>
-      </div>
-      <div class="kpi-card kt">
-        <div class="kpi-label">Total Registros</div>
-        <div class="kpi-value" id="d-total">0</div>
-        <div class="kpi-sub">histórico completo</div>
-      </div>
+  <!-- ── Fila 1: KPIs ── -->
+  <div class="dash-kpi-row">
+    <div class="kpi-card kf">
+      <div class="kpi-label">FORZADOS ACTIVOS</div>
+      <div class="kpi-value" id="d-forzados">0</div>
+      <div class="kpi-sub">en estado FORZADO</div>
+    </div>
+    <div class="kpi-card kl">
+      <div class="kpi-label">LIBERADOS</div>
+      <div class="kpi-value" id="d-liberados">0</div>
+      <div class="kpi-sub">señales normalizadas</div>
+    </div>
+    <div class="kpi-card kp">
+      <div class="kpi-label">RECHAZADOS</div>
+      <div class="kpi-value" id="d-rechazados">0</div>
+      <div class="kpi-sub">solicitud rechazada</div>
+    </div>
+    <div class="kpi-card kt">
+      <div class="kpi-label">TOTAL REGISTROS</div>
+      <div class="kpi-value" id="d-total">0</div>
+      <div class="kpi-sub">histórico completo</div>
+    </div>
+    <div class="kpi-card" style="border-top-color:var(--blue)">
+      <div class="kpi-label">TIEMPO PROM. NORMALIZ.</div>
+      <div class="kpi-value" id="d-avgtime" style="color:var(--blue);font-size:26px">—</div>
+      <div class="kpi-sub">horas promedio (liberados)</div>
     </div>
   </div>
 
-  <div class="dash-grid-2">
-    <!-- Por Área -->
-    <div class="dash-card">
-      <div class="dash-card-title">Forzados por Área</div>
-      <div id="chart-area"></div>
+  <!-- ── Fila 2: 3 columnas principales ── -->
+  <div class="dash-main-row">
+
+    <!-- Col 1: Evolución temporal -->
+    <div class="dash-card dash-card-wide">
+      <div class="dash-card-title">📈 Evolución Temporal</div>
+      <div class="dash-time-controls">
+        <button class="time-btn active" data-days="7">7D</button>
+        <button class="time-btn" data-days="30">30D</button>
+        <button class="time-btn" data-days="90">90D</button>
+      </div>
+      <canvas id="chart-temporal" height="120"></canvas>
     </div>
 
-    <!-- Por Disciplina -->
+    <!-- Col 2: Comparativa por área -->
     <div class="dash-card">
-      <div class="dash-card-title">Forzados por Disciplina</div>
-      <div id="chart-disc"></div>
+      <div class="dash-card-title">📊 Estados por Área</div>
+      <canvas id="chart-area-stack" height="160"></canvas>
     </div>
-  </div>
 
-  <div class="dash-grid-2">
-    <!-- Donut estado -->
-    <div class="dash-card">
-      <div class="dash-card-title">Distribución por Estado</div>
-      <div class="donut-wrap">
-        <svg class="donut-svg" width="120" height="120" viewBox="0 0 120 120" id="donut-svg">
+    <!-- Col 3: Donut estado -->
+    <div class="dash-card dash-card-narrow">
+      <div class="dash-card-title">🔵 Distribución Estado</div>
+      <div class="donut-wrap" style="justify-content:center;padding-top:8px">
+        <svg width="110" height="110" viewBox="0 0 120 120" id="donut-svg">
           <circle cx="60" cy="60" r="46" fill="none" stroke="var(--border)" stroke-width="14"/>
           <circle id="arc-f" cx="60" cy="60" r="46" fill="none" stroke="var(--amber)" stroke-width="14"
             stroke-dasharray="0 289" stroke-linecap="butt" transform="rotate(-90 60 60)"
@@ -993,10 +926,10 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.6 }
           <circle id="arc-p" cx="60" cy="60" r="46" fill="none" stroke="var(--red)" stroke-width="14"
             stroke-dasharray="0 289" stroke-linecap="butt" transform="rotate(-90 60 60)"
             style="transition:stroke-dasharray .5s ease"/>
-          <text x="60" y="56" text-anchor="middle" font-family="Rajdhani" font-size="22" font-weight="700" fill="var(--white)" id="donut-total">0</text>
+          <text x="60" y="56" text-anchor="middle" font-family="Rajdhani" font-size="22" font-weight="700" fill="var(--blue)" id="donut-total">0</text>
           <text x="60" y="70" text-anchor="middle" font-family="Share Tech Mono" font-size="9" fill="var(--text2)">TOTAL</text>
         </svg>
-        <div class="donut-legend">
+        <div class="donut-legend" style="margin-top:10px">
           <div class="legend-row"><span class="legend-dot" style="background:var(--amber)"></span><span>Forzados: <strong id="leg-f">0</strong></span></div>
           <div class="legend-row"><span class="legend-dot" style="background:var(--green)"></span><span>Liberados: <strong id="leg-l">0</strong></span></div>
           <div class="legend-row"><span class="legend-dot" style="background:var(--red)"></span><span>Rechazados: <strong id="leg-p">0</strong></span></div>
@@ -1004,13 +937,38 @@ input::placeholder, textarea::placeholder { color:var(--text2); opacity:.6 }
       </div>
     </div>
 
-    <!-- Recientes -->
-    <div class="dash-card">
-      <div class="dash-card-title">Últimos Registros</div>
-      <div id="recent-list"></div>
-    </div>
   </div>
 
+  <!-- ── Fila 3: 4 columnas inferiores ── -->
+  <div class="dash-bottom-row">
+
+    <!-- Top equipos -->
+    <div class="dash-card">
+      <div class="dash-card-title">🔧 Top Equipos con más Forzados</div>
+      <div id="chart-equipos"></div>
+    </div>
+
+    <!-- Por responsable -->
+    <div class="dash-card">
+      <div class="dash-card-title">👤 Forzados Activos por Responsable</div>
+      <div id="chart-responsable"></div>
+    </div>
+
+    <!-- Por disciplina -->
+    <div class="dash-card">
+      <div class="dash-card-title">🏷 Forzados por Disciplina</div>
+      <div id="chart-disc"></div>
+    </div>
+
+    <!-- Tiempo por área -->
+    <div class="dash-card">
+      <div class="dash-card-title">⏱ Tiempo Prom. Normalización (hrs)</div>
+      <div id="chart-tiempo"></div>
+    </div>
+
+  </div>
+
+</div>
 </div>
 
 <!-- ══════════════════════════════════════════════════════ -->
@@ -1767,7 +1725,22 @@ function render(){
 }
 
 // ── Dashboard ──────────────────────────────────────────
+// ── Dashboard ──────────────────────────────────────────
+let chartTemporal = null, chartAreaStack = null;
+let dashDays = 7;
+
+document.querySelectorAll('.time-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    dashDays = parseInt(btn.dataset.days);
+    renderDashboard();
+  });
+});
+
 function renderDashboard(){
+  if(!document.getElementById('page-dashboard').classList.contains('active')) return;
+
   const nF = records.filter(r=>r.estado==='FORZADO').length;
   const nL = records.filter(r=>r.estado==='LIBERADO').length;
   const nP = records.filter(r=>r.estado==='PENDIENTE').length;
@@ -1782,44 +1755,145 @@ function renderDashboard(){
   document.getElementById('leg-p').textContent = nP;
   document.getElementById('donut-total').textContent = nT;
 
+  // Tiempo promedio normalización
+  const libTimes = records
+    .filter(r => r.ts && r.lib_ts && r.estado === 'LIBERADO')
+    .map(r => (new Date(r.lib_ts) - new Date(r.ts)) / 3600000)
+    .filter(h => h > 0 && h < 8760);
+  const avgTime = libTimes.length
+    ? (libTimes.reduce((a,b)=>a+b,0)/libTimes.length).toFixed(1)
+    : '—';
+  document.getElementById('d-avgtime').textContent = avgTime === '—' ? '—' : avgTime + 'h';
+
   // Donut
-  const circ = 2 * Math.PI * 46; // ~289
+  const circ = 2 * Math.PI * 46;
   if(nT > 0){
-    const pF = (nF/nT)*circ, pL=(nL/nT)*circ, pP=(nP/nT)*circ;
-    const gF = document.getElementById('arc-f');
-    const gL = document.getElementById('arc-l');
-    const gP = document.getElementById('arc-p');
+    const pF=(nF/nT)*circ, pL=(nL/nT)*circ, pP=(nP/nT)*circ;
+    const gF=document.getElementById('arc-f');
+    const gL=document.getElementById('arc-l');
+    const gP=document.getElementById('arc-p');
     gF.setAttribute('stroke-dasharray',`${pF} ${circ}`);
     gL.setAttribute('stroke-dasharray',`${pL} ${circ}`);
-    gL.setAttribute('stroke-dashoffset', `-${pF}`);
+    gL.setAttribute('stroke-dashoffset',`-${pF}`);
     gP.setAttribute('stroke-dasharray',`${pP} ${circ}`);
-    gP.setAttribute('stroke-dashoffset', `-${pF+pL}`);
+    gP.setAttribute('stroke-dashoffset',`-${pF+pL}`);
   }
 
-  // Bar chart: por área
-  renderBarChart('chart-area', 'area', 'var(--amber)');
-  renderBarChart('chart-disc', 'disciplina', 'var(--cyan)');
+  if(typeof Chart === 'undefined'){
+    setTimeout(renderDashboard, 400); return;
+  }
 
-  // Recent
-  const recent = [...records].sort((a,b)=>(b.ts||'') > (a.ts||'') ? 1 : -1).slice(0,6);
-  document.getElementById('recent-list').innerHTML = recent.map(r => {
-    const bc = r.estado==='FORZADO'?'b-forzado':r.estado==='LIBERADO'?'b-liberado':'b-pendiente';
-    return `<div class="recent-item">
-      <span class="badge ${bc}">${r.estado}</span>
-      <span class="ri-tag">${r.tag}</span>
-      <span class="ri-area">${r.area||'—'}</span>
-      <span class="ri-ts">${(r.ts||'').replace('T',' ')}</span>
-    </div>`;
-  }).join('') || '<div style="color:var(--text2);font-size:12px">Sin registros</div>';
+  // ── Evolución temporal ──────────────────────────────
+  const now = new Date();
+  const labels = [], dataF = [], dataL = [], dataR = [];
+  for(let i = dashDays-1; i >= 0; i--){
+    const d = new Date(now); d.setDate(d.getDate()-i);
+    const ds = d.toISOString().slice(0,10);
+    labels.push(ds.slice(5)); // MM-DD
+    dataF.push(records.filter(r=>r.ts&&r.ts.startsWith(ds)&&r.estado==='FORZADO').length);
+    dataL.push(records.filter(r=>r.ts&&r.ts.startsWith(ds)&&r.estado==='LIBERADO').length);
+    dataR.push(records.filter(r=>r.ts&&r.ts.startsWith(ds)&&r.estado==='PENDIENTE').length);
+  }
+  const ctxT = document.getElementById('chart-temporal').getContext('2d');
+  if(chartTemporal) chartTemporal.destroy();
+  chartTemporal = new Chart(ctxT, {
+    type:'bar',
+    data:{
+      labels,
+      datasets:[
+        {label:'Forzados', data:dataF, backgroundColor:'rgba(240,165,0,.7)', borderRadius:2},
+        {label:'Liberados', data:dataL, backgroundColor:'rgba(26,158,92,.7)', borderRadius:2},
+        {label:'Rechazados', data:dataR, backgroundColor:'rgba(217,53,53,.6)', borderRadius:2}
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{labels:{font:{size:10},boxWidth:10}},tooltip:{mode:'index'}},
+      scales:{
+        x:{ticks:{font:{size:9}},grid:{display:false}},
+        y:{ticks:{font:{size:9},stepSize:1},grid:{color:'rgba(0,0,0,.05)'}}
+      }
+    }
+  });
+
+  // ── Comparativa por área (barras apiladas) ──────────
+  const areas = [...new Set(records.map(r=>r.area||'Sin área'))].slice(0,8);
+  const aF = areas.map(a=>records.filter(r=>(r.area||'Sin área')===a&&r.estado==='FORZADO').length);
+  const aL = areas.map(a=>records.filter(r=>(r.area||'Sin área')===a&&r.estado==='LIBERADO').length);
+  const aR = areas.map(a=>records.filter(r=>(r.area||'Sin área')===a&&r.estado==='PENDIENTE').length);
+  const shortAreas = areas.map(a=>a.length>12?a.slice(0,12)+'…':a);
+  const ctxA = document.getElementById('chart-area-stack').getContext('2d');
+  if(chartAreaStack) chartAreaStack.destroy();
+  chartAreaStack = new Chart(ctxA, {
+    type:'bar',
+    data:{
+      labels:shortAreas,
+      datasets:[
+        {label:'Forzados', data:aF, backgroundColor:'rgba(240,165,0,.75)', borderRadius:2},
+        {label:'Liberados', data:aL, backgroundColor:'rgba(26,158,92,.75)', borderRadius:2},
+        {label:'Rechazados', data:aR, backgroundColor:'rgba(217,53,53,.65)', borderRadius:2}
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{labels:{font:{size:10},boxWidth:10}}},
+      scales:{
+        x:{stacked:true, ticks:{font:{size:9}},grid:{display:false}},
+        y:{stacked:true, ticks:{font:{size:9},stepSize:1},grid:{color:'rgba(0,0,0,.05)'}}
+      }
+    }
+  });
+
+  // ── Top equipos ─────────────────────────────────────
+  renderBarChart('chart-equipos','equipo','#1a7db5',10);
+
+  // ── Forzados activos por responsable ────────────────
+  const respCounts = {};
+  records.filter(r=>r.estado==='FORZADO').forEach(r=>{
+    const k = r.responsable||'Sin asignar';
+    respCounts[k]=(respCounts[k]||0)+1;
+  });
+  const respSorted = Object.entries(respCounts).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const maxR = respSorted[0]?.[1]||1;
+  document.getElementById('chart-responsable').innerHTML = respSorted.map(([k,v])=>`
+    <div class="bar-row">
+      <div class="bar-label" title="${k}">${k}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${(v/maxR)*100}%;background:#e05252"></div></div>
+      <div class="bar-count">${v}</div>
+    </div>`).join('')||'<div style="color:var(--text2);font-size:11px">Sin forzados activos</div>';
+
+  // ── Disciplinas ──────────────────────────────────────
+  renderBarChart('chart-disc','disciplina','#2196b8',8);
+
+  // ── Tiempo normalización por área ───────────────────
+  const tiempoArea = {};
+  records.filter(r=>r.ts&&r.lib_ts&&r.estado==='LIBERADO').forEach(r=>{
+    const hrs = (new Date(r.lib_ts)-new Date(r.ts))/3600000;
+    if(hrs>0&&hrs<8760){
+      const a = r.area||'Sin área';
+      if(!tiempoArea[a]) tiempoArea[a]={sum:0,cnt:0};
+      tiempoArea[a].sum+=hrs; tiempoArea[a].cnt++;
+    }
+  });
+  const tiempoSorted = Object.entries(tiempoArea)
+    .map(([k,v])=>[k, parseFloat((v.sum/v.cnt).toFixed(1))])
+    .sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const maxT = tiempoSorted[0]?.[1]||1;
+  document.getElementById('chart-tiempo').innerHTML = tiempoSorted.map(([k,v])=>`
+    <div class="bar-row">
+      <div class="bar-label" title="${k}">${k}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${(v/maxT)*100}%;background:#4fc3d8"></div></div>
+      <div class="bar-count">${v}h</div>
+    </div>`).join('')||'<div style="color:var(--text2);font-size:11px">Sin datos de liberación</div>';
 }
 
-function renderBarChart(containerId, field, color){
+function renderBarChart(containerId, field, color, limit=8){
   const counts = {};
   records.forEach(r => {
     const k = r[field] || 'Sin definir';
     counts[k] = (counts[k]||0) + 1;
   });
-  const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,limit);
   const max = sorted[0]?.[1] || 1;
   document.getElementById(containerId).innerHTML = sorted.map(([k,v]) =>
     `<div class="bar-row">
@@ -1827,7 +1901,7 @@ function renderBarChart(containerId, field, color){
       <div class="bar-track"><div class="bar-fill" style="width:${(v/max)*100}%;background:${color}"></div></div>
       <div class="bar-count">${v}</div>
     </div>`
-  ).join('') || '<div style="color:var(--text2);font-size:12px">Sin datos</div>';
+  ).join('') || '<div style="color:var(--text2);font-size:11px">Sin datos</div>';
 }
 
 // ── Export ─────────────────────────────────────────────
@@ -1906,5 +1980,6 @@ function toast(msg, color='var(--green)'){
   setTimeout(() => t.classList.remove('show'), 2600);
 }
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 </body>
 </html>
