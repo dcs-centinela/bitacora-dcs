@@ -1476,8 +1476,12 @@ function setSelectOptions(id, list){
   const sel = document.getElementById(id);
   if(!sel || sel.tagName !== 'SELECT') return;
   const current = sel.value;
+  // Siempre incluir el valor actual aunque no esté en la lista
+  const extraOpt = (current && !list.includes(current))
+    ? `<option value="${current}" selected>${current}</option>` : '';
   sel.innerHTML = '<option value="">— Seleccionar —</option>' +
     list.map(v => `<option${v===current?' selected':''}>${v}</option>`).join('') +
+    extraOpt +
     '<option value="__otro__">Otro...</option>';
 }
 
@@ -1485,9 +1489,11 @@ function setSelectValue(id, val){
   const sel = document.getElementById(id);
   if(!sel) return;
   if(sel.tagName === 'SELECT'){
-    // Add option if not present
-    if(val && ![...sel.options].find(o => o.value === val)){
-      sel.innerHTML += `<option value="${val}">${val}</option>`;
+    // Agregar opción si no existe en la lista
+    if(val && ![...sel.options].find(o => o.value === val || o.text === val)){
+      const opt = document.createElement('option');
+      opt.value = val; opt.text = val;
+      sel.appendChild(opt);
     }
     sel.value = val;
   } else {
@@ -1499,26 +1505,41 @@ function convertToSelect(id, list, placeholder){
   const el = document.getElementById(id);
   if(!el) return;
   if(el.tagName === 'SELECT'){
+    // Ya es select — actualizar opciones preservando valor actual
     setSelectOptions(id, list);
     return;
   }
-  // Replace input with select
+  // Reemplazar input por select
+  const currentVal = el.value || '';
   const sel = document.createElement('select');
   sel.id = id;
   sel.style.cssText = el.style.cssText;
   sel.className = el.className;
+
+  const extraOpt = (currentVal && !list.includes(currentVal))
+    ? `<option value="${currentVal}">${currentVal}</option>` : '';
+
   if(list.length === 0){
-    sel.innerHTML = `<option value="">— Sin valores configurados —</option><option value="__otro__">Escribir manualmente...</option>`;
+    sel.innerHTML = `<option value="">— Sin valores configurados —</option>` +
+      extraOpt +
+      `<option value="__otro__">Escribir manualmente...</option>`;
   } else {
     sel.innerHTML = `<option value="">— ${placeholder} —</option>` +
-      list.map(v => `<option>${v}</option>`).join('') +
+      list.map(v => `<option${v===currentVal?' selected':''}>${v}</option>`).join('') +
+      extraOpt +
       '<option value="__otro__">Otro...</option>';
   }
+  if(currentVal) sel.value = currentVal;
+
   sel.addEventListener('change', function(){
     if(this.value === '__otro__'){
       const txt = prompt('Ingresa el valor:');
-      if(txt){ this.innerHTML += `<option value="${txt}" selected>${txt}</option>`; this.value = txt; }
-      else { this.value = '' }
+      if(txt){
+        const opt = document.createElement('option');
+        opt.value = txt; opt.text = txt; opt.selected = true;
+        this.insertBefore(opt, this.lastElementChild);
+        this.value = txt;
+      } else { this.value = currentVal || '' }
     }
   });
   el.parentNode.replaceChild(sel, el);
@@ -1575,30 +1596,53 @@ function openModal(id = null){
   if(!isEditor){ toast('Se requiere modo EDITOR', 'var(--red)'); return }
   editDocId = id;
   document.getElementById('modal-mode-label').textContent = id ? 'EDITAR' : 'NUEVO';
+
   if(id){
     const r = records.find(x => x._id === id);
     if(!r) return;
-    document.getElementById('f-id').value           = r.id_registro || '';
-    document.getElementById('f-tag').value          = r.tag || '';
-    document.getElementById('f-desc').value         = r.desc || '';
-    document.getElementById('f-causa').value        = r.causa || '';
-    document.getElementById('f-area').value         = r.area || '';
-    document.getElementById('f-disciplina').value   = r.disciplina || '';
-    document.getElementById('f-tipo').value         = r.tipo || '';
-    document.getElementById('f-valor').value        = r.valor || '';
-    document.getElementById('f-vorig').value        = r.vorig || '';
-    document.getElementById('f-oper').value         = r.operador || '';
-    document.getElementById('f-responsable').value  = r.responsable || '';
-    document.getElementById('f-ts').value           = r.ts || '';
-    document.getElementById('f-equipo').value       = r.equipo || '';
-    setSelectValue('f-causa', r.causa || '');
-    document.getElementById('f-ts-norm').value      = r.ts_norm || '';
-    document.getElementById('f-aviso-ot').value     = r.aviso_ot || '';
-    document.getElementById('f-resp-norm').value    = r.resp_norm || '';
-    document.getElementById('f-critico').checked    = r.critico || false;
+
+    // 1. Cargar valores en campos de texto primero
+    document.getElementById('f-id').value          = r.id_registro || '';
+    document.getElementById('f-tag').value         = r.tag || '';
+    document.getElementById('f-desc').value        = r.desc || '';
+    document.getElementById('f-valor').value       = r.valor || '';
+    document.getElementById('f-vorig').value       = r.vorig || '';
+    document.getElementById('f-ts').value          = r.ts || '';
+    document.getElementById('f-equipo').value      = r.equipo || '';
+    document.getElementById('f-ts-norm').value     = r.ts_norm || '';
+    document.getElementById('f-aviso-ot').value    = r.aviso_ot || '';
+    document.getElementById('f-critico').checked   = r.critico || false;
+
+    // 2. Pre-cargar valores en selects/inputs antes de populateFormSelects
+    //    para que convertToSelect los preserve al reconstruir
+    const preSet = (elId, val) => {
+      const el = document.getElementById(elId);
+      if(el) el.value = val || '';
+    };
+    preSet('f-oper',        r.operador   || '');
+    preSet('f-responsable', r.responsable|| '');
+    preSet('f-resp-norm',   r.resp_norm  || '');
+    preSet('f-area',        r.area       || '');
+    preSet('f-disciplina',  r.disciplina || '');
+    preSet('f-tipo',        r.tipo       || '');
+    preSet('f-causa',       r.causa      || '');
+
+    // 3. Reconstruir selects con listas — preserva los valores pre-cargados
+    populateFormSelects();
+
+    // 4. Asegurar valores en selects (por si el valor no está en la lista)
+    setSelectValue('f-area',        r.area        || '');
+    setSelectValue('f-disciplina',  r.disciplina  || '');
+    setSelectValue('f-tipo',        r.tipo        || '');
+    setSelectValue('f-causa',       r.causa       || '');
+    setSelectValue('f-oper',        r.operador    || '');
+    setSelectValue('f-responsable', r.responsable || '');
+    setSelectValue('f-resp-norm',   r.resp_norm   || '');
+
     actualizarEstadoDisplay();
   } else {
     clearForm();
+    populateFormSelects();
     document.getElementById('f-ts').value = nowLocal();
     actualizarEstadoDisplay();
   }
