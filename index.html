@@ -684,18 +684,30 @@ canvas{flex:1;min-height:0;width:100% !important}
 }
 .config-close:hover { background: var(--red-g); color: var(--red) }
 .config-tabs {
-  display: flex; border-bottom: 1px solid var(--border); flex-shrink: 0;
+  display: flex;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  gap: 2px;
+  padding: 4px 4px 0;
 }
 .cfg-tab {
-  flex: 1; padding: 10px 4px;
-  background: transparent; border: none;
-  color: var(--text2); font-family: var(--sans);
-  font-size: 11px; font-weight: 600; letter-spacing: 1px;
-  cursor: pointer; border-bottom: 2px solid transparent;
-  transition: all .15s; text-transform: uppercase;
+  padding: 6px 10px;
+  background: transparent;
+  border: none;
+  color: var(--text2);
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all .15s;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
-.cfg-tab.active { color: var(--amber); border-bottom-color: var(--amber) }
-.cfg-tab:hover { color: var(--white) }
+.cfg-tab.active { color: var(--blue); border-bottom-color: var(--blue) }
+.cfg-tab:hover { color: var(--blue) }
 .config-body { flex: 1; overflow-y: auto; padding: 16px 20px }
 .cfg-list-wrap { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px }
 .cfg-item {
