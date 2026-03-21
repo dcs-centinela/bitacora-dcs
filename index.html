@@ -659,8 +659,9 @@ canvas{flex:1;min-height:0;width:100% !important}
 
 /* ── FILTROS FILA 2 ──────────────────────────────────── */
 .toolbar-filters {
-  flex-wrap:wrap; gap:5px; padding:6px 12px;
-  background:#f8fafc; border-bottom:1px solid var(--border); border-top:none; min-height:0;
+  flex-wrap:wrap; gap:5px; padding:5px 12px;
+  background:#f8fafc; border-bottom:1px solid var(--border); border-top:none;
+  min-height:0; align-items:center;
 }
 .filter-group-label {
   font-family:var(--sans); font-size:9px; font-weight:700;
@@ -668,7 +669,7 @@ canvas{flex:1;min-height:0;width:100% !important}
   display:flex; align-items:center; flex-shrink:0;
 }
 .filter-pill2 {
-  padding:3px 10px; border:1px solid var(--border);
+  padding:3px 9px; border:1px solid var(--border);
   background:transparent; color:var(--text2);
   font-family:var(--sans); font-size:10px; font-weight:600;
   cursor:pointer; border-radius:12px; transition:all .15s; white-space:nowrap;
@@ -676,11 +677,12 @@ canvas{flex:1;min-height:0;width:100% !important}
 .filter-pill2:hover { border-color:var(--blue); color:var(--blue) }
 .filter-pill2.active { border-color:var(--blue); color:var(--blue); background:var(--blue-g) }
 .filter-pill2.disc-active { border-color:#9b59b6; color:#9b59b6; background:#f5eeff }
-.filter-sep { width:1px; height:20px; background:var(--border); flex-shrink:0; margin:0 4px }
+.filter-sep { width:1px; height:18px; background:var(--border); flex-shrink:0; margin:0 3px }
 .filter-date {
-  padding:3px 8px; border:1px solid var(--border);
+  padding:3px 6px; border:1px solid var(--border);
   border-radius:var(--radius); font-family:var(--mono);
   font-size:10px; color:var(--text); background:#fff; cursor:pointer;
+  width:110px;
 }
 .filter-date:focus { outline:none; border-color:var(--blue) }
 .filter-clear-btn {
@@ -689,7 +691,18 @@ canvas{flex:1;min-height:0;width:100% !important}
   cursor:pointer; border-radius:var(--radius);
 }
 .filter-clear-btn:hover { border-color:var(--red); color:var(--red) }
-#disc-filter-btns { display:flex; gap:4px; flex-wrap:wrap }
+.filter-counter {
+  display:flex; align-items:center; gap:4px;
+  background:var(--blue); border-radius:12px;
+  padding:3px 10px; margin-left:auto; flex-shrink:0;
+}
+#filter-count {
+  font-family:var(--sans); font-size:13px; font-weight:700; color:#fff;
+}
+.filter-counter-label {
+  font-family:var(--sans); font-size:9px; font-weight:600;
+  color:rgba(255,255,255,.8); letter-spacing:1px; text-transform:uppercase;
+}
 
 /* ── MOVIMIENTOS PAGE ────────────────────────────────── */
 .mov-section {
@@ -982,7 +995,7 @@ tbody tr.r-critico { outline: 1px solid rgba(217,53,53,.25); }
     <button class="btn-new" id="btn-new" onclick="openModal()" style="display:none">+ NUEVO</button>
   </div>
 
-  <!-- ── Fila 2: grupo área + disciplina + fechas ── -->
+  <!-- ── Fila 2: grupo área + disciplina + fechas + contador ── -->
   <div class="toolbar toolbar-filters">
 
     <!-- Grupos de área -->
@@ -995,17 +1008,25 @@ tbody tr.r-critico { outline: 1px solid rgba(217,53,53,.25); }
 
     <!-- Disciplinas -->
     <div class="filter-group-label">DISCIPLINA:</div>
-    <button class="filter-pill2 active" data-disc="ALL">TODAS</button>
-    <div id="disc-filter-btns"></div>
+    <button class="filter-pill2 active" data-disc="ALL" onclick="setDiscFilter(this,'ALL')">TODAS</button>
+    <div id="disc-filter-btns" style="display:contents"></div>
 
     <div class="filter-sep"></div>
 
-    <!-- Rango de fechas -->
+    <!-- Rango de fechas compacto -->
     <div class="filter-group-label">DESDE:</div>
     <input type="date" id="filter-fecha-ini" class="filter-date" onchange="render()">
     <div class="filter-group-label">HASTA:</div>
     <input type="date" id="filter-fecha-fin" class="filter-date" onchange="render()">
     <button onclick="clearFechas()" class="filter-clear-btn" title="Limpiar fechas">✕</button>
+
+    <div class="filter-sep"></div>
+
+    <!-- Contador de registros filtrados -->
+    <div class="filter-counter">
+      <span id="filter-count">0</span>
+      <span class="filter-counter-label">registros</span>
+    </div>
 
   </div>
 
@@ -1483,8 +1504,12 @@ function buildDiscFilters(){
   ).join('');
 }
 function setDiscFilter(btn, disc){
-  document.querySelectorAll('[data-disc]').forEach(b => { b.classList.remove('active','disc-active') });
-  if(filterDisc === disc){
+  // Deseleccionar todos
+  document.querySelectorAll('[data-disc]').forEach(b => {
+    b.classList.remove('active','disc-active');
+  });
+  if(disc === 'ALL' || filterDisc === disc){
+    // Volver a TODAS
     filterDisc = 'ALL';
     document.querySelector('[data-disc="ALL"]').classList.add('active');
   } else {
@@ -2339,6 +2364,8 @@ function render(){
   const cntV = document.getElementById('cnt-v');
   if(cntV) cntV.textContent = records.filter(r=>r.estado==='VENCIDO').length;
   document.getElementById('export-count').textContent = filtered.length;
+  const fc = document.getElementById('filter-count');
+  if(fc) fc.textContent = filtered.length;
 
   const tbody = document.getElementById('tbody');
   const empty = document.getElementById('empty');
