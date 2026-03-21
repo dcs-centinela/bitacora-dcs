@@ -834,7 +834,7 @@ tbody tr.r-critico { outline: 1px solid rgba(217,53,53,.25); }
     <button class="cfg-tab active" data-list="solicitantes">SOLICITANTES</button>
     <button class="cfg-tab" data-list="areas">ÁREAS</button>
     <button class="cfg-tab" data-list="disciplinas">DISCIPLINAS</button>
-    <button class="cfg-tab" data-list="responsables">RESPONSABLES</button>
+    <button class="cfg-tab" data-list="responsables">AUTORIZADORES</button>
     <button class="cfg-tab" data-list="tipos">TIPOS</button>
     <button class="cfg-tab" data-list="causas">CAUSAS</button>
     <button class="cfg-tab" data-list="resp_norm">RESP. NORM.</button>
@@ -913,7 +913,7 @@ tbody tr.r-critico { outline: 1px solid rgba(217,53,53,.25); }
           <th data-col="valor">VALOR</th>
           <th data-col="estado">ESTADO ↕</th>
           <th data-col="operador">SOLICITANTE ↕</th>
-          <th data-col="responsable">RESPONSABLE ↕</th>
+          <th data-col="responsable">AUTORIZADOR ↕</th>
           <th data-col="ts_norm">F. NORMALIZACIÓN ↕</th>
           <th data-col="aviso_ot">AVISO/OT SAP</th>
           <th data-col="resp_norm">RESP. NORMALIZACIÓN ↕</th>
@@ -1146,8 +1146,8 @@ tbody tr.r-critico { outline: 1px solid rgba(217,53,53,.25); }
           <input id="f-oper" type="text" placeholder="Nombre del solicitante">
         </div>
         <div class="field">
-          <label>Responsable *</label>
-          <input id="f-responsable" type="text" placeholder="Quien autoriza y normaliza el forzado">
+          <label>Autorizador *</label>
+          <input id="f-responsable" type="text" placeholder="Quien autoriza el forzado">
         </div>
         <div class="field">
           <label>Fecha / Hora forzado</label>
@@ -1383,7 +1383,7 @@ const CFG_DEFAULTS = {
 };
 const CFG_LABELS = {
   solicitantes:'Solicitantes', areas:'Áreas', disciplinas:'Disciplinas',
-  responsables:'Responsables', tipos:'Tipos de señal',
+  responsables:'Autorizadores', tipos:'Tipos de señal',
   causas:'Causas / Motivos de forzado',
   resp_norm:'Responsables de Normalización (Nombre | correo@dominio.com)',
   correos:'Correos para reporte semanal'
@@ -1654,7 +1654,7 @@ function populateFormSelects(){
   const respNormNames = (cfgLists.resp_norm||[]).map(v => v.split('|')[0].trim());
   convertToSelect('f-resp-norm', respNormNames, 'Seleccionar responsable...');
   convertToSelect('f-oper', cfgLists.solicitantes, 'Seleccionar solicitante...');
-  convertToSelect('f-responsable', cfgLists.responsables, 'Seleccionar responsable...');
+  convertToSelect('f-responsable', cfgLists.responsables, 'Seleccionar autorizador...');
 }
 
 // Mapa campo → lista de configuración
@@ -2461,7 +2461,7 @@ const expData = () => filtered.length ? filtered : records;
 
 function exportCSV(){
   const cols = ['ID','Tag','Equipo','Descripción','Área','Disciplina','Tipo','Valor Forzado',
-    'Valor Original','Estado','Solicitante','Responsable','Fecha Forzado',
+    'Valor Original','Estado','Solicitante','Autorizador','Fecha Forzado',
     'F. Normalización','Aviso/OT SAP','Resp. Normalización','Causa'];
   const rows = expData().map(r => [
     r.id_registro,r.tag,r.equipo,r.desc,r.area,r.disciplina,r.tipo,r.valor,r.vorig,
@@ -2482,7 +2482,7 @@ function exportTXT(){
   const lines = expData().map((r,i) =>
     `[${i+1}] ${r.tag} — ${r.estado}\n` +
     `    Área: ${r.area||'—'} | Disciplina: ${r.disciplina||'—'} | Equipo: ${r.equipo||'—'}\n` +
-    `    Solicitante: ${r.operador||'—'} | Responsable: ${r.responsable||'—'}\n` +
+    `    Solicitante: ${r.operador||'—'} | Autorizador: ${r.responsable||'—'}\n` +
     `    Fecha forzado: ${r.ts||'—'}\n` +
     (r.ts_norm ? `    F. Normalización: ${r.ts_norm} | Resp: ${r.resp_norm||'—'} | OT: ${r.aviso_ot||'—'}\n` : '') +
     (r.causa ? `    Causa: ${r.causa}\n` : '')
@@ -2511,7 +2511,7 @@ function exportHTML(){
   <p>Generado: ${new Date().toLocaleString('es-CL')} | Total: ${expData().length} registros</p>
   <table><thead><tr>
   <th>ID</th><th>Tag</th><th>Equipo</th><th>Área</th><th>Disciplina</th>
-  <th>Estado</th><th>Solicitante</th><th>Responsable</th><th>Forzado</th>
+  <th>Estado</th><th>Solicitante</th><th>Autorizador</th><th>Forzado</th>
   <th>F.Normalización</th><th>Aviso/OT SAP</th><th>Resp.Normalización</th>
   </tr></thead><tbody>${rows}</tbody></table></body></html>`;
   dl(`reporte_dcs_${new Date().toISOString().slice(0,10)}.html`, html, 'text/html');
