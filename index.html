@@ -657,6 +657,40 @@ canvas{flex:1;min-height:0;width:100% !important}
 @keyframes load-anim{to{width:100%}}
 .loading-sub { font-size:11px; color:var(--text2); letter-spacing:2px }
 
+/* ── FILTROS FILA 2 ──────────────────────────────────── */
+.toolbar-filters {
+  flex-wrap:wrap; gap:5px; padding:6px 12px;
+  background:#f8fafc; border-bottom:1px solid var(--border); border-top:none; min-height:0;
+}
+.filter-group-label {
+  font-family:var(--sans); font-size:9px; font-weight:700;
+  letter-spacing:1.5px; color:var(--text2); text-transform:uppercase;
+  display:flex; align-items:center; flex-shrink:0;
+}
+.filter-pill2 {
+  padding:3px 10px; border:1px solid var(--border);
+  background:transparent; color:var(--text2);
+  font-family:var(--sans); font-size:10px; font-weight:600;
+  cursor:pointer; border-radius:12px; transition:all .15s; white-space:nowrap;
+}
+.filter-pill2:hover { border-color:var(--blue); color:var(--blue) }
+.filter-pill2.active { border-color:var(--blue); color:var(--blue); background:var(--blue-g) }
+.filter-pill2.disc-active { border-color:#9b59b6; color:#9b59b6; background:#f5eeff }
+.filter-sep { width:1px; height:20px; background:var(--border); flex-shrink:0; margin:0 4px }
+.filter-date {
+  padding:3px 8px; border:1px solid var(--border);
+  border-radius:var(--radius); font-family:var(--mono);
+  font-size:10px; color:var(--text); background:#fff; cursor:pointer;
+}
+.filter-date:focus { outline:none; border-color:var(--blue) }
+.filter-clear-btn {
+  padding:2px 7px; border:1px solid var(--border);
+  background:transparent; color:var(--text2); font-size:11px;
+  cursor:pointer; border-radius:var(--radius);
+}
+.filter-clear-btn:hover { border-color:var(--red); color:var(--red) }
+#disc-filter-btns { display:flex; gap:4px; flex-wrap:wrap }
+
 /* ── MOVIMIENTOS PAGE ────────────────────────────────── */
 .mov-section {
   background:#fff; border:1px solid var(--border); border-radius:var(--radius);
@@ -923,6 +957,7 @@ tbody tr.r-critico { outline: 1px solid rgba(217,53,53,.25); }
 <!-- ══════════════════════════════════════════════════════ -->
 <div class="page active" id="page-bitacora">
 
+  <!-- ── Fila 1: estado + stats + acciones ── -->
   <div class="toolbar">
     <div class="search-wrap">
       <span class="search-icon">⌕</span>
@@ -945,6 +980,33 @@ tbody tr.r-critico { outline: 1px solid rgba(217,53,53,.25); }
 
     <button class="btn-export" onclick="openExport()">⤓ EXPORTAR</button>
     <button class="btn-new" id="btn-new" onclick="openModal()" style="display:none">+ NUEVO</button>
+  </div>
+
+  <!-- ── Fila 2: grupo área + disciplina + fechas ── -->
+  <div class="toolbar toolbar-filters">
+
+    <!-- Grupos de área -->
+    <div class="filter-group-label">ÁREA:</div>
+    <button class="filter-pill2 active" data-grupo="ALL">TODAS</button>
+    <button class="filter-pill2" data-grupo="PLANTA">🏭 PLANTA CONC.</button>
+    <button class="filter-pill2" data-grupo="MUELLE">⚓ MUELLE SIAM</button>
+
+    <div class="filter-sep"></div>
+
+    <!-- Disciplinas -->
+    <div class="filter-group-label">DISCIPLINA:</div>
+    <button class="filter-pill2 active" data-disc="ALL">TODAS</button>
+    <div id="disc-filter-btns"></div>
+
+    <div class="filter-sep"></div>
+
+    <!-- Rango de fechas -->
+    <div class="filter-group-label">DESDE:</div>
+    <input type="date" id="filter-fecha-ini" class="filter-date" onchange="render()">
+    <div class="filter-group-label">HASTA:</div>
+    <input type="date" id="filter-fecha-fin" class="filter-date" onchange="render()">
+    <button onclick="clearFechas()" class="filter-clear-btn" title="Limpiar fechas">✕</button>
+
   </div>
 
   <div class="table-wrap">
@@ -1390,8 +1452,54 @@ const EDITOR_PIN = 'Dcs.2026';
 // ── State ──────────────────────────────────────────────
 let records   = [];
 let filtered  = [];
-let filterF   = 'ALL';
-let searchQ   = '';
+let filterF    = 'ALL';
+let filterGrupo = 'ALL';
+let filterDisc  = 'ALL';
+let searchQ    = '';
+
+// Grupos de área
+const GRUPOS_AREA = {
+  PLANTA: ['Chancado','Molienda','Flotación','Planta Molibdeno','Relaves y Concentraducto'],
+  MUELLE: ['Muelle','SIAM']
+};
+
+// Listeners filtros grupo área
+document.querySelectorAll('[data-grupo]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-grupo]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    filterGrupo = btn.dataset.grupo;
+    render();
+  });
+});
+
+// Listeners filtros disciplina — se generan dinámicamente
+function buildDiscFilters(){
+  const disc = cfgLists.disciplinas || [];
+  const wrap = document.getElementById('disc-filter-btns');
+  if(!wrap) return;
+  wrap.innerHTML = disc.map(d =>
+    `<button class="filter-pill2" data-disc="${d}" onclick="setDiscFilter(this,'${d}')">${d}</button>`
+  ).join('');
+}
+function setDiscFilter(btn, disc){
+  document.querySelectorAll('[data-disc]').forEach(b => { b.classList.remove('active','disc-active') });
+  if(filterDisc === disc){
+    filterDisc = 'ALL';
+    document.querySelector('[data-disc="ALL"]').classList.add('active');
+  } else {
+    filterDisc = disc;
+    btn.classList.add('disc-active');
+  }
+  render();
+}
+
+// Limpiar fechas
+function clearFechas(){
+  document.getElementById('filter-fecha-ini').value = '';
+  document.getElementById('filter-fecha-fin').value = '';
+  render();
+}
 let sortCol   = 'ts';
 let sortDir   = -1;
 let editDocId = null;
@@ -1511,6 +1619,7 @@ async function loadCfgFromFirebase(){
   } catch(e){ console.warn('Config load error:',e) }
   renderCfgList();
   populateFormSelects();
+  buildDiscFilters();
 }
 
 // Save config lists to Firebase
@@ -1521,6 +1630,7 @@ async function saveCfgToFirebase(){
     await setDoc(doc(db,'_config','listas'), cfgLists);
   } catch(e){ console.warn('Config save error:',e) }
   populateFormSelects();
+  buildDiscFilters();
 }
 
 // ── Historial Semanal ──────────────────────────────────
@@ -2185,13 +2295,32 @@ function render(){
     r.estado = calcularEstado(r.ts, r.ts_norm);
   });
 
+  const fechaIni = document.getElementById('filter-fecha-ini')?.value;
+  const fechaFin = document.getElementById('filter-fecha-fin')?.value;
+
   filtered = records.filter(r => {
+    // Filtro estado
     const ms = filterF==='ALL' ? true :
                filterF==='CRITICO' ? r.critico === true :
                r.estado === filterF;
+
+    // Filtro grupo área
+    const mg = filterGrupo==='ALL' ? true :
+               GRUPOS_AREA[filterGrupo]?.includes(r.area||'') || false;
+
+    // Filtro disciplina
+    const md = filterDisc==='ALL' ? true : r.disciplina === filterDisc;
+
+    // Filtro fecha (por fecha de forzado)
+    const ts = r.ts ? r.ts.slice(0,10) : '';
+    const mfi = !fechaIni || ts >= fechaIni;
+    const mff = !fechaFin || ts <= fechaFin;
+
+    // Filtro búsqueda
     const mq = !searchQ || [r.tag,r.desc,r.area,r.operador,r.responsable,r.equipo,r.id_registro,r.disciplina,r.aviso_ot,r.resp_norm,r.causa]
       .join(' ').toLowerCase().includes(searchQ);
-    return ms && mq;
+
+    return ms && mg && md && mfi && mff && mq;
   });
 
   filtered.sort((a,b) => {
