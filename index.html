@@ -907,6 +907,7 @@ tbody tr.r-critico { outline: 1px solid rgba(217,53,53,.25); }
       <button class="nav-btn active" data-page="bitacora">BITÁCORA</button>
       <button class="nav-btn" data-page="dashboard">DASHBOARD</button>
       <button class="nav-btn" data-page="movimientos">MOVIMIENTOS</button>
+      <button class="nav-btn" data-page="powerapps">POWER APPS</button>
     </nav>
   </div>
   <div class="hdr-right">
@@ -1232,6 +1233,69 @@ tbody tr.r-critico { outline: 1px solid rgba(217,53,53,.25); }
     <div class="mov-subsection">
       <div class="mov-subsection-title mov-removed">▼ PROGRAMADOS PARA NORMALIZACIÓN ESTA SEMANA</div>
       <div id="mov-semana-removed"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!--  PAGE: POWER APPS                                      -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="page" id="page-powerapps" style="flex-direction:column;overflow:hidden">
+
+  <!-- Toolbar Power Apps -->
+  <div class="toolbar" style="flex-shrink:0">
+    <div class="search-wrap">
+      <span class="search-icon">⌕</span>
+      <input id="pa-search" type="text" placeholder="Buscar TAG, solicitante, área..." oninput="renderPowerApps()">
+    </div>
+    <button class="filter-pill2 active" data-pa-estado="ALL" onclick="setPAEstado(this,'ALL')">TODOS</button>
+    <button class="filter-pill2" data-pa-estado="Aprobado" onclick="setPAEstado(this,'Aprobado')" style="border-color:#1a9e5c;color:#1a9e5c">● APROBADO</button>
+    <button class="filter-pill2" data-pa-estado="Pendiente" onclick="setPAEstado(this,'Pendiente')" style="">● PENDIENTE</button>
+    <button class="filter-pill2" data-pa-estado="Retirado" onclick="setPAEstado(this,'Retirado')">● RETIRADO</button>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+      <div class="filter-counter" id="pa-counter-wrap">
+        <span id="pa-count">0</span>
+        <span class="filter-counter-label">registros</span>
+      </div>
+      <button onclick="loadPowerAppsData()" style="padding:4px 12px;border:1px solid var(--border);background:var(--blue-g);color:var(--blue);font-family:var(--sans);font-size:11px;font-weight:600;cursor:pointer;border-radius:var(--radius)">↻ ACTUALIZAR</button>
+    </div>
+  </div>
+
+  <!-- Estado de carga -->
+  <div id="pa-status" style="padding:8px 16px;font-size:11px;color:var(--text2);flex-shrink:0;font-family:var(--mono)"></div>
+
+  <!-- Tabla -->
+  <div class="table-wrap" style="flex:1;overflow-y:auto">
+    <table id="pa-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>F. SOLICITUD FRC</th>
+          <th>TAG</th>
+          <th>EQUIPO</th>
+          <th>MOTIVO</th>
+          <th>ÁREA</th>
+          <th>DISCIPLINA</th>
+          <th>TIPO</th>
+          <th>CRÍTICO</th>
+          <th>ESTADO</th>
+          <th>SOLICITANTE</th>
+          <th>SI APROBADOR</th>
+          <th>JTO APROBADOR</th>
+          <th>JTE APROBADOR</th>
+          <th>DCS EJEC. FRC</th>
+          <th>F. SOLICITUD RET</th>
+          <th>SOLICITANTE RET.</th>
+          <th>DCS EJEC. RET</th>
+          <th>TRATAMIENTO</th>
+        </tr>
+      </thead>
+      <tbody id="pa-tbody"></tbody>
+    </table>
+    <div id="pa-empty" class="empty-state" style="display:none">
+      <div class="empty-icon">📋</div>
+      <div class="empty-text">SIN DATOS</div>
     </div>
   </div>
 
@@ -1567,6 +1631,10 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
       });
     }
     if (btn.dataset.page === 'movimientos') renderMovimientos();
+    if (btn.dataset.page === 'powerapps') {
+      if(!paData.length) loadPowerAppsData();
+      else renderPowerApps();
+    }
   });
 });
 
@@ -3028,7 +3096,148 @@ function exportHTML(){
   document.getElementById('modal-export').classList.remove('open');
 }
 
-// ── Toast ──────────────────────────────────────────────
+// ── Power Apps ─────────────────────────────────────────
+const PA_SHEET_ID  = '1vf3MTkH7nxkUxeeiWTdaatskv1Clg_XEthOpby1DObQ';
+const PA_SHEET_URL = `https://docs.google.com/spreadsheets/d/${PA_SHEET_ID}/gviz/tq?tqx=out:json`;
+
+let paData     = [];
+let paEstado   = 'ALL';
+
+// Columnas del sheet (índice 0-based):
+// 0:ID 1:Hora inicio 2:Hora fin 3:Email Sol 4:Solicitante FRC 5:Crítico
+// 6:Tipo Forzado 7:SI Aprobador FRC 8:JTO Aprobador FRC 9:JTE Aprobador FRC
+// 10:TAG 11:Equipo 12:Disciplina 13:Motivo 14:Detalle 15:Estado
+// 16:Solicitante RET 17:SI Aprobador RET 18:Email Sol RET 19:JTO Aprobador RET
+// 20:JTE Aprobador RET 21:DCS Ejec FRC 22:DCS Ejec RET 23:Motivo Retiro
+// 24:Fecha Solicitud RET 25:Fecha Solicitud FRC 26:Area 27:Tratamiento
+
+function setPAEstado(btn, estado){
+  document.querySelectorAll('[data-pa-estado]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  paEstado = estado;
+  renderPowerApps();
+}
+
+async function loadPowerAppsData(){
+  const status = document.getElementById('pa-status');
+  status.textContent = '⏳ Cargando datos desde Google Sheets...';
+  try {
+    const resp = await fetch(PA_SHEET_URL);
+    const text = await resp.text();
+    // La respuesta viene envuelta: /*O_o*/google.visualization.Query.setResponse({...})
+    const json = JSON.parse(text.replace(/^.*?google\.visualization\.Query\.setResponse\(/, '').replace(/\);?\s*$/, ''));
+    const rows = json.table.rows;
+    paData = rows.map(row => {
+      const c = row.c || [];
+      const get = i => c[i]?.v !== null && c[i]?.v !== undefined ? String(c[i].v) : '';
+      const getFmt = i => c[i]?.f || get(i); // formatted value
+      return {
+        id:           get(0),
+        hora_ini:     getFmt(1),
+        hora_fin:     getFmt(2),
+        solicitante:  get(4),
+        critico:      get(5),
+        tipo:         get(6),
+        si_aprobador: get(7),
+        jto_aprobador:get(8),
+        jte_aprobador:get(9),
+        tag:          get(10),
+        equipo:       get(11),
+        disciplina:   get(12),
+        motivo:       get(13),
+        detalle:      get(14),
+        estado:       get(15),
+        sol_ret:      get(16),
+        si_apro_ret:  get(17),
+        jto_apro_ret: get(19),
+        jte_apro_ret: get(20),
+        dcs_ejec_frc: get(21),
+        dcs_ejec_ret: get(22),
+        motivo_ret:   get(23),
+        fecha_ret:    getFmt(24),
+        fecha_frc:    getFmt(25),
+        area:         get(26),
+        tratamiento:  get(27),
+      };
+    }).filter(r => r.tag || r.id); // descartar filas vacías
+
+    status.textContent = `✅ ${paData.length} registros cargados — actualizado ${new Date().toLocaleTimeString('es-CL')}`;
+    renderPowerApps();
+  } catch(e) {
+    status.textContent = `❌ Error al cargar: ${e.message}`;
+    console.error('Power Apps load error:', e);
+  }
+}
+
+function renderPowerApps(){
+  const q = (document.getElementById('pa-search')?.value || '').toLowerCase();
+
+  const filtered = paData.filter(r => {
+    const ms = paEstado === 'ALL' || (r.estado||'').toLowerCase().includes(paEstado.toLowerCase());
+    const mq = !q || [r.tag,r.equipo,r.area,r.solicitante,r.disciplina,r.motivo,r.id,r.dcs_ejec_frc]
+      .join(' ').toLowerCase().includes(q);
+    return ms && mq;
+  });
+
+  document.getElementById('pa-count').textContent = filtered.length;
+
+  const getBadgePA = (estado) => {
+    const e = (estado||'').toLowerCase();
+    if(e.includes('aprobado') || e.includes('activo'))
+      return `<span class="badge" style="background:#e6f7ee;color:#1a7a4a;border:1px solid #8ed4ae">${estado}</span>`;
+    if(e.includes('pendiente') || e.includes('espera'))
+      return `<span class="badge" style="background:#fff3e0;color:#c47e00;border:1px solid #f0c060">${estado}</span>`;
+    if(e.includes('retir') || e.includes('cerrad') || e.includes('finaliz'))
+      return `<span class="badge" style="background:#f0f0f0;color:#666;border:1px solid #ccc">${estado}</span>`;
+    if(e.includes('rechaz'))
+      return `<span class="badge" style="background:#fef0f0;color:#d93535;border:1px solid #f0a0a0">${estado}</span>`;
+    return `<span class="badge" style="background:#f0f0f0;color:#666">${estado||'—'}</span>`;
+  };
+
+  const tbody = document.getElementById('pa-tbody');
+  const empty = document.getElementById('pa-empty');
+
+  if(!filtered.length){
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = filtered.map(r => {
+    const esCritico = (r.critico||'').toLowerCase().includes('s') || r.critico === 'true' || r.critico === '1';
+    const rowStyle  = esCritico ? 'background:#fff5f5' : '';
+    const borderL   = (() => {
+      const e = (r.estado||'').toLowerCase();
+      if(e.includes('aprobado')||e.includes('activo')) return '#1a9e5c';
+      if(e.includes('pendiente')||e.includes('espera')) return '#f0a500';
+      if(e.includes('retir')||e.includes('cerrad'))    return '#888';
+      if(e.includes('rechaz'))                          return '#d93535';
+      return '#ddd';
+    })();
+    return `<tr style="${rowStyle};border-left:3px solid ${borderL}">
+      <td class="td-id">${r.id||'—'}</td>
+      <td class="td-small">${r.fecha_frc||'—'}</td>
+      <td class="td-tag">${r.tag||'—'}${esCritico?' <span style="color:#d93535;font-size:10px">🔴</span>':''}</td>
+      <td style="font-size:11px">${r.equipo||'—'}</td>
+      <td style="font-size:11px;max-width:150px" title="${r.detalle||''}">${r.motivo||'—'}</td>
+      <td style="font-size:11px">${r.area||'—'}</td>
+      <td style="color:var(--cyan);font-size:11px">${r.disciplina||'—'}</td>
+      <td class="td-small">${r.tipo||'—'}</td>
+      <td style="text-align:center">${esCritico?'<span style="color:#d93535">🔴</span>':'—'}</td>
+      <td>${getBadgePA(r.estado)}</td>
+      <td style="font-size:11px">${r.solicitante||'—'}</td>
+      <td style="font-size:11px">${r.si_aprobador||'—'}</td>
+      <td style="font-size:11px">${r.jto_aprobador||'—'}</td>
+      <td style="font-size:11px">${r.jte_aprobador||'—'}</td>
+      <td style="font-size:11px;color:var(--blue)">${r.dcs_ejec_frc||'—'}</td>
+      <td class="td-small">${r.fecha_ret||'—'}</td>
+      <td style="font-size:11px">${r.sol_ret||'—'}</td>
+      <td style="font-size:11px;color:var(--blue)">${r.dcs_ejec_ret||'—'}</td>
+      <td style="font-size:11px;max-width:120px" title="${r.tratamiento||''}">${r.tratamiento||'—'}</td>
+    </tr>`;
+  }).join('');
+}
 function toast(msg, color='var(--green)'){
   const t = document.getElementById('toast');
   t.textContent = msg;
