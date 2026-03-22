@@ -3472,19 +3472,11 @@ async function loadPowerAppsData(){
       };
     }).filter(r => r.tag || r.id);
 
-    // Deduplicar por ID — conservar el registro con fecha Modificado más reciente
+    // Deduplicar por ID — conservar la ÚLTIMA fila del Sheet (índice más alto)
+    // El Map.set sobreescribe con cada iteración, quedando siempre el último
     const dedupMap = new Map();
     paData.forEach(r => {
-      if(!r.id) return;
-      const existing = dedupMap.get(r.id);
-      if(!existing){
-        dedupMap.set(r.id, r);
-      } else {
-        // Comparar fechas de modificación — quedar con la más reciente
-        const dNew = new Date(r.modificado || 0);
-        const dOld = new Date(existing.modificado || 0);
-        if(dNew > dOld) dedupMap.set(r.id, r);
-      }
+      if(r.id) dedupMap.set(String(r.id).trim(), r);
     });
     paData = [...dedupMap.values()];
 
