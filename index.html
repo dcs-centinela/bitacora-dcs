@@ -1802,9 +1802,18 @@ function setRole(role){
   const badge = document.getElementById('role-badge');
   badge.textContent = isEditor ? '✎ EDITOR' : '👁 VISUALIZADOR';
   badge.className = 'role-badge ' + (isEditor ? 'editor' : 'viewer');
-  document.getElementById('btn-new').style.display = isEditor ? 'block' : 'none';
-  document.getElementById('col-acc').style.display = isEditor ? '' : 'none';
+  document.getElementById('btn-new').style.display    = isEditor ? 'block' : 'none';
+  document.getElementById('col-acc').style.display    = isEditor ? '' : 'none';
   document.getElementById('btn-config').style.display = isEditor ? 'block' : 'none';
+  // Botones movimientos
+  ['btn-mov-new','btn-mov-ret'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.style.display = isEditor ? '' : 'none';
+  });
+  ['mov-acc-head-agr','mov-acc-head-ret'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.style.display = isEditor ? '' : 'none';
+  });
   if(!isEditor) closeConfig();
   document.getElementById('modal-role').classList.remove('open');
   hidePinInput();
@@ -3131,6 +3140,15 @@ async function deleteMovimiento(tipo, idx){
 
 function renderMovimientos(){
   buildMovSemanaSelector();
+  // Mostrar/ocultar botones según rol inmediatamente
+  ['btn-mov-new','btn-mov-ret'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.style.display = isEditor ? '' : 'none';
+  });
+  ['mov-acc-head-agr','mov-acc-head-ret'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.style.display = isEditor ? '' : 'none';
+  });
   loadMovimientos();
 }
 
