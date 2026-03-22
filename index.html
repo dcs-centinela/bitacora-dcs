@@ -1268,34 +1268,34 @@ tbody tr.r-critico { outline: 1px solid rgba(217,53,53,.25); }
 <!-- ══════════════════════════════════════════════════════ -->
 <div class="page" id="page-powerapps" style="flex-direction:column;overflow:hidden">
 
-  <!-- Fila 1: búsqueda + estado + contador + actualizar -->
-  <div class="toolbar" style="flex-shrink:0;gap:6px">
-    <div class="search-wrap">
+  <!-- Fila única: búsqueda + filtros + contador + actualizar -->
+  <div class="toolbar" style="flex-shrink:0;gap:5px;flex-wrap:nowrap;overflow-x:auto">
+    <div class="search-wrap" style="min-width:160px;max-width:180px">
       <span class="search-icon">⌕</span>
-      <input id="pa-search" type="text" placeholder="Buscar TAG, solicitante..." oninput="renderPowerApps()">
+      <input id="pa-search" type="text" placeholder="Buscar TAG..." oninput="renderPowerApps()">
     </div>
-    <select id="pa-sel-estado" class="pa-select" onchange="renderPowerApps()">
+    <select id="pa-sel-estado" class="pa-select" style="min-width:140px;max-width:180px" onchange="renderPowerApps()">
       <option value="">TODOS LOS ESTADOS</option>
     </select>
-    <select id="pa-sel-area" class="pa-select" onchange="renderPowerApps()">
+    <select id="pa-sel-area" class="pa-select" style="min-width:120px;max-width:160px" onchange="renderPowerApps()">
       <option value="">TODAS LAS ÁREAS</option>
     </select>
-    <select id="pa-sel-disc" class="pa-select" onchange="renderPowerApps()">
-      <option value="">TODAS LAS DISCIPLINAS</option>
+    <select id="pa-sel-disc" class="pa-select" style="min-width:120px;max-width:150px" onchange="renderPowerApps()">
+      <option value="">TODAS LAS DISC.</option>
     </select>
-    <select id="pa-sel-tiempo" class="pa-select" onchange="renderPowerApps()">
+    <select id="pa-sel-tiempo" class="pa-select" style="min-width:120px;max-width:140px" onchange="renderPowerApps()">
       <option value="">TODO EL PERÍODO</option>
       <option value="7">Últimos 7 días</option>
       <option value="14">Últimos 14 días</option>
       <option value="30">Últimos 30 días</option>
       <option value="90">Últimos 90 días</option>
     </select>
-    <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+    <div style="margin-left:auto;display:flex;align-items:center;gap:6px;flex-shrink:0">
       <div class="filter-counter">
         <span id="pa-count">0</span>
-        <span class="filter-counter-label">registros</span>
+        <span class="filter-counter-label">reg.</span>
       </div>
-      <button onclick="loadPowerAppsData()" style="padding:4px 12px;border:1px solid var(--border);background:var(--blue-g);color:var(--blue);font-family:var(--sans);font-size:11px;font-weight:600;cursor:pointer;border-radius:var(--radius)">↻ ACTUALIZAR</button>
+      <button onclick="loadPowerAppsData()" style="padding:4px 10px;border:1px solid var(--border);background:var(--blue-g);color:var(--blue);font-family:var(--sans);font-size:11px;font-weight:600;cursor:pointer;border-radius:var(--radius);white-space:nowrap">↻ ACT.</button>
     </div>
   </div>
 
@@ -3156,7 +3156,7 @@ function exportHTML(){
 
 // ── Power Apps ─────────────────────────────────────────
 const PA_SHEET_ID  = '1vf3MTkH7nxkUxeeiWTdaatskv1Clg_XEthOpby1DObQ';
-const PA_SHEET_URL = `https://docs.google.com/spreadsheets/d/${PA_SHEET_ID}/gviz/tq?tqx=out:json`;
+const PA_SHEET_URL = `https://docs.google.com/spreadsheets/d/${PA_SHEET_ID}/gviz/tq?tqx=out:json&sheet=Vista&range=A2:ZZ`;
 
 let paData     = [];
 
@@ -3260,6 +3260,13 @@ async function loadPowerAppsData(){
         tratamiento:   get(27),
       };
     }).filter(r => r.tag || r.id);
+
+    // Ordenar por ID de mayor a menor
+    paData.sort((a, b) => {
+      const nA = parseInt(a.id) || 0;
+      const nB = parseInt(b.id) || 0;
+      return nB - nA;
+    });
 
     status.textContent = `✅ ${paData.length} registros cargados — actualizado ${new Date().toLocaleTimeString('es-CL')}`;
     buildPAFilters();
