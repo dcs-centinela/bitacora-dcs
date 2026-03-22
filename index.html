@@ -730,6 +730,24 @@ canvas{flex:1;min-height:0;width:100% !important}
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
   padding:5px 6px; font-size:10px;
 }
+/* ── MOVIMIENTOS TABLE ───────────────────────────────── */
+.mov-table {
+  width:100%; border-collapse:collapse;
+}
+.mov-table th {
+  background:#e8f0f8; color:var(--blue); font-family:var(--sans);
+  font-size:9px; font-weight:700; letter-spacing:1.5px;
+  padding:7px 10px; text-align:left; white-space:nowrap;
+  border-bottom:2px solid var(--blue);
+}
+.mov-table td {
+  padding:7px 10px; border-bottom:1px solid var(--border);
+  font-size:11px; color:var(--text);
+}
+.mov-table tbody tr:hover { background:#f8fafc }
+.mov-table .td-tag  { color:var(--blue); font-weight:600; font-family:var(--mono) }
+.mov-table .td-disc { color:var(--cyan) }
+
 .mov-section {
   background:#fff; border:1px solid var(--border); border-radius:var(--radius);
   overflow:hidden; flex-shrink:0;
@@ -1216,51 +1234,121 @@ tbody tr.r-critico { outline: 1px solid rgba(217,53,53,.25); }
 <!-- ══════════════════════════════════════════════════════ -->
 <!--  PAGE: MOVIMIENTOS                                     -->
 <!-- ══════════════════════════════════════════════════════ -->
-<div class="page" id="page-movimientos" style="flex-direction:column;overflow-y:auto;padding:16px;gap:16px">
+<div class="page" id="page-movimientos" style="flex-direction:column;overflow:hidden">
 
-  <!-- Header con selector de turno y semana -->
-  <div style="display:flex;align-items:center;gap:12px;flex-shrink:0">
-    <div style="font-family:var(--sans);font-size:13px;font-weight:700;letter-spacing:2px;color:var(--blue)">
-      📋 MOVIMIENTOS DEL PERÍODO
+  <!-- Toolbar -->
+  <div class="toolbar" style="flex-shrink:0;gap:8px">
+    <div style="font-family:var(--sans);font-size:12px;font-weight:700;letter-spacing:2px;color:var(--blue)">
+      📋 MOVIMIENTOS SEMANALES
     </div>
-    <div style="margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--text2)" id="mov-periodo-label"></div>
-    <button onclick="renderMovimientos()" style="padding:4px 12px;border:1px solid var(--border);background:var(--blue-g);color:var(--blue);font-family:var(--sans);font-size:11px;font-weight:600;cursor:pointer;border-radius:var(--radius)">↻ ACTUALIZAR</button>
-  </div>
-
-  <!-- Turno actual -->
-  <div class="mov-section">
-    <div class="mov-section-header">
-      <span class="mov-section-icon">🕐</span>
-      <span class="mov-section-title" id="mov-turno-title">TURNO ACTUAL</span>
-      <span class="mov-badge-count" id="mov-turno-count">0</span>
-    </div>
-    <div class="mov-subsection">
-      <div class="mov-subsection-title mov-added">▲ AÑADIDOS EN ESTE TURNO</div>
-      <div id="mov-turno-added"></div>
-    </div>
-    <div class="mov-subsection">
-      <div class="mov-subsection-title mov-removed">▼ PROGRAMADOS PARA NORMALIZACIÓN EN ESTE TURNO</div>
-      <div id="mov-turno-removed"></div>
+    <!-- Selector de semana -->
+    <select id="mov-sel-semana" class="pa-select" style="min-width:180px" onchange="loadMovimientos()">
+    </select>
+    <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+      <span id="mov-status" style="font-family:var(--mono);font-size:10px;color:var(--text2)"></span>
+      <button id="btn-mov-new" onclick="openMovModal('agregado')" style="display:none;padding:5px 12px;background:var(--blue);color:#fff;border:none;border-radius:var(--radius);font-family:var(--sans);font-size:11px;font-weight:700;cursor:pointer;letter-spacing:1px">+ AGREGAR</button>
+      <button id="btn-mov-ret" onclick="openMovModal('retirado')" style="display:none;padding:5px 12px;background:#9b59b6;color:#fff;border:none;border-radius:var(--radius);font-family:var(--sans);font-size:11px;font-weight:700;cursor:pointer;letter-spacing:1px">+ RETIRADO</button>
     </div>
   </div>
 
-  <!-- Semana actual Mar→Lun -->
-  <div class="mov-section">
-    <div class="mov-section-header">
-      <span class="mov-section-icon">📅</span>
-      <span class="mov-section-title" id="mov-semana-title">SEMANA ACTUAL</span>
-      <span class="mov-badge-count" id="mov-semana-count">0</span>
+  <!-- Tablas -->
+  <div style="flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:16px">
+
+    <!-- Agregados -->
+    <div class="mov-section">
+      <div class="mov-section-header" style="background:#e6f2fa;border-bottom-color:var(--blue)">
+        <span class="mov-section-title" style="color:var(--blue)">▲ AGREGADOS</span>
+        <span class="mov-badge-count" id="mov-cnt-agr">0</span>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="mov-table" id="mov-tbl-agr">
+          <thead><tr>
+            <th>SOLICITANTE</th><th>AUTORIZADOR</th><th>RESPONSABLE</th>
+            <th>DESCRIPCIÓN DE FALLA</th><th>ÁREA</th><th>EQUIPO</th>
+            <th>TAG</th><th>DISCIPLINA</th><th id="mov-acc-head-agr" style="display:none">ACC.</th>
+          </tr></thead>
+          <tbody id="mov-body-agr"></tbody>
+        </table>
+        <div id="mov-empty-agr" class="mov-empty" style="padding:16px">Sin registros agregados esta semana</div>
+      </div>
     </div>
-    <div class="mov-subsection">
-      <div class="mov-subsection-title mov-added">▲ AÑADIDOS ESTA SEMANA</div>
-      <div id="mov-semana-added"></div>
+
+    <!-- Retirados -->
+    <div class="mov-section">
+      <div class="mov-section-header" style="background:#f5eeff;border-bottom-color:#9b59b6">
+        <span class="mov-section-title" style="color:#9b59b6">▼ RETIRADOS</span>
+        <span class="mov-badge-count" id="mov-cnt-ret" style="background:#9b59b6">0</span>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="mov-table" id="mov-tbl-ret">
+          <thead><tr>
+            <th>SOLICITANTE</th><th>AUTORIZADOR</th><th>RESPONSABLE</th>
+            <th>DESCRIPCIÓN DE FALLA</th><th>ÁREA</th><th>EQUIPO</th>
+            <th>TAG</th><th>DISCIPLINA</th><th id="mov-acc-head-ret" style="display:none">ACC.</th>
+          </tr></thead>
+          <tbody id="mov-body-ret"></tbody>
+        </table>
+        <div id="mov-empty-ret" class="mov-empty" style="padding:16px">Sin registros retirados esta semana</div>
+      </div>
     </div>
-    <div class="mov-subsection">
-      <div class="mov-subsection-title mov-removed">▼ PROGRAMADOS PARA NORMALIZACIÓN ESTA SEMANA</div>
-      <div id="mov-semana-removed"></div>
+
+  </div>
+</div>
+
+<!-- Modal ingreso movimiento -->
+<div class="overlay" id="modal-mov">
+<div class="modal" style="max-width:560px">
+  <div class="modal-header">
+    <div class="modal-title" id="mov-modal-title">NUEVO <span>MOVIMIENTO</span></div>
+    <button class="modal-close" onclick="closeMovModal()">✕</button>
+  </div>
+  <div class="modal-body">
+    <input type="hidden" id="mov-tipo-hidden">
+    <input type="hidden" id="mov-edit-id">
+    <div class="form-grid fg-3" style="margin-bottom:10px">
+      <div class="field">
+        <label>Solicitante *</label>
+        <input id="mov-solicitante" type="text" placeholder="Nombre solicitante">
+      </div>
+      <div class="field">
+        <label>Autorizador *</label>
+        <input id="mov-autorizador" type="text" placeholder="Nombre autorizador">
+      </div>
+      <div class="field">
+        <label>Responsable *</label>
+        <input id="mov-responsable" type="text" placeholder="Nombre responsable">
+      </div>
+    </div>
+    <div class="form-grid fg-2" style="margin-bottom:10px">
+      <div class="field" style="grid-column:span 2">
+        <label>Descripción de Falla *</label>
+        <input id="mov-descripcion" type="text" placeholder="Ej: Falla Mecánica - Desalineamiento Correa">
+      </div>
+    </div>
+    <div class="form-grid fg-4">
+      <div class="field">
+        <label>Área *</label>
+        <select id="mov-area"><option value="">— Seleccionar —</option></select>
+      </div>
+      <div class="field">
+        <label>Equipo</label>
+        <input id="mov-equipo" type="text" placeholder="Ej: 315-FE-003">
+      </div>
+      <div class="field">
+        <label>TAG *</label>
+        <input id="mov-tag" type="text" placeholder="Ej: 315-ZSHH-3062AB">
+      </div>
+      <div class="field">
+        <label>Disciplina *</label>
+        <select id="mov-disc"><option value="">— Seleccionar —</option></select>
+      </div>
     </div>
   </div>
-
+  <div class="modal-footer">
+    <button class="btn-secondary" onclick="closeMovModal()">Cancelar</button>
+    <button class="btn-primary" onclick="saveMovimiento()">GUARDAR</button>
+  </div>
+</div>
 </div>
 
 <!-- ══════════════════════════════════════════════════════ -->
@@ -2150,8 +2238,6 @@ function initFirebase(){
       render();
       if(document.getElementById('page-dashboard').classList.contains('active'))
         renderDashboard();
-      if(document.getElementById('page-movimientos').classList.contains('active'))
-        renderMovimientos();
     }, err => {
       console.warn('Firestore error:', err);
       initFallback();
@@ -2843,101 +2929,209 @@ function renderBarChart(containerId, field, color, limit=8){
   ).join('') || '<div style="color:var(--text2);font-size:11px">Sin datos</div>';
 }
 
-// ── Movimientos ────────────────────────────────────────
-function renderMovimientos(){
-  if(!document.getElementById('page-movimientos').classList.contains('active')) return;
+// ── Movimientos manuales ───────────────────────────────
+let movData = {}; // { "2026-S12": { agregados:[], retirados:[] } }
+let movSemanaActual = '';
 
-  const ahora = new Date();
-
-  // ── Calcular inicio del turno actual ──────────────────
-  const horaCL = ahora.getHours();
-  const iniciaTurnoDia   = new Date(ahora); iniciaTurnoDia.setHours(7,0,0,0);
-  const iniciaTurnoNoche = new Date(ahora); iniciaTurnoNoche.setHours(19,0,0,0);
-  let inicioTurno, nombreTurno;
-  if(horaCL >= 7 && horaCL < 19){
-    inicioTurno = iniciaTurnoDia;
-    nombreTurno = 'TURNO DÍA — ' + inicioTurno.toLocaleDateString('es-CL',{weekday:'short',day:'2-digit',month:'2-digit'}) + ' 07:00';
-  } else if(horaCL >= 19){
-    inicioTurno = iniciaTurnoNoche;
-    nombreTurno = 'TURNO NOCHE — ' + inicioTurno.toLocaleDateString('es-CL',{weekday:'short',day:'2-digit',month:'2-digit'}) + ' 19:00';
-  } else {
-    // Madrugada — turno noche del día anterior
-    inicioTurno = new Date(ahora); inicioTurno.setDate(inicioTurno.getDate()-1); inicioTurno.setHours(19,0,0,0);
-    nombreTurno = 'TURNO NOCHE — ' + inicioTurno.toLocaleDateString('es-CL',{weekday:'short',day:'2-digit',month:'2-digit'}) + ' 19:00';
-  }
-
-  // ── Calcular inicio de semana laboral (martes) ────────
-  const diaSemana = ahora.getDay(); // 0=Dom 2=Mar
+// Calcular clave de semana "YYYY-SNN" (semana ISO, martes→lunes)
+function getSemanaKey(date){
+  const d = new Date(date);
+  const diaSemana = d.getDay();
   const diasDesdeMartes = (diaSemana - 2 + 7) % 7;
-  const inicioSemana = new Date(ahora);
-  inicioSemana.setDate(ahora.getDate() - diasDesdeMartes);
-  inicioSemana.setHours(0,0,0,0);
-  const finSemana = new Date(inicioSemana); finSemana.setDate(inicioSemana.getDate()+6); finSemana.setHours(23,59,59,999);
-
-  const fmtFecha = d => new Date(d).toLocaleDateString('es-CL',{weekday:'short',day:'2-digit',month:'2-digit'});
-  const semanaLabel = `${fmtFecha(inicioSemana)} → ${fmtFecha(finSemana)}`;
-
-  document.getElementById('mov-turno-title').textContent  = nombreTurno;
-  document.getElementById('mov-semana-title').textContent = 'SEMANA: ' + semanaLabel;
-  document.getElementById('mov-periodo-label').textContent = 'Actualizado: ' + ahora.toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'});
-
-  // Recalcular estados
-  records.forEach(r => { r.estado = calcularEstado(r.ts, r.ts_norm); });
-
-  // ── TURNO: añadidos (ts dentro del turno) ─────────────
-  const turnoAdded   = records.filter(r => r.ts && new Date(r.ts) >= inicioTurno && new Date(r.ts) <= ahora);
-  // ── TURNO: programados (ts_norm dentro del turno) ─────
-  const turnoRemoved = records.filter(r => r.ts_norm && new Date(r.ts_norm) >= inicioTurno && new Date(r.ts_norm) <= ahora);
-
-  // ── SEMANA: añadidos ──────────────────────────────────
-  const semAdded   = records.filter(r => r.ts && new Date(r.ts) >= inicioSemana && new Date(r.ts) <= ahora);
-  // ── SEMANA: programados para normalización ────────────
-  const semRemoved = records.filter(r => r.ts_norm && new Date(r.ts_norm) >= inicioSemana && new Date(r.ts_norm) <= ahora);
-
-  // Contadores
-  document.getElementById('mov-turno-count').textContent  = turnoAdded.length + turnoRemoved.length;
-  document.getElementById('mov-semana-count').textContent = semAdded.length + semRemoved.length;
-
-  // Renderizar listas
-  renderMovList('mov-turno-added',   turnoAdded,   'added');
-  renderMovList('mov-turno-removed', turnoRemoved, 'removed');
-  renderMovList('mov-semana-added',   semAdded,    'added');
-  renderMovList('mov-semana-removed', semRemoved,  'removed');
+  const martes = new Date(d);
+  martes.setDate(d.getDate() - diasDesdeMartes);
+  martes.setHours(0,0,0,0);
+  const lunes = new Date(martes);
+  lunes.setDate(martes.getDate() + 6);
+  const fmt = x => x.toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit'});
+  const semNum = getISOWeek(martes);
+  return {
+    key: `${martes.getFullYear()}-S${String(semNum).padStart(2,'0')}`,
+    label: `Semana ${semNum} — ${fmt(martes)} al ${fmt(lunes)} (${martes.getFullYear()})`
+  };
 }
 
-function renderMovList(containerId, lista, tipo){
-  const container = document.getElementById(containerId);
-  if(!lista.length){
-    container.innerHTML = `<div class="mov-empty">Sin registros en este período</div>`;
-    return;
+// Generar lista de últimas 20 semanas para el selector
+function buildMovSemanaSelector(){
+  const sel = document.getElementById('mov-sel-semana');
+  if(!sel) return;
+  const opts = [];
+  const ahora = new Date();
+  for(let i = 0; i < 20; i++){
+    const d = new Date(ahora);
+    d.setDate(ahora.getDate() - i * 7);
+    const { key, label } = getSemanaKey(d);
+    if(!opts.find(o => o.key === key)) opts.push({ key, label });
   }
-  const fmtTs = ts => ts ? new Date(ts).toLocaleString('es-CL',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—';
-  const fmtDate = d => d ? new Date(d).toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit',year:'2-digit'}) : '—';
+  sel.innerHTML = opts.map(o =>
+    `<option value="${o.key}">${o.label}</option>`
+  ).join('');
+  movSemanaActual = opts[0]?.key || '';
+}
 
-  container.innerHTML = lista.map(r => {
-    const bc  = getBadgeClass(r.estado);
-    const esCritico = r.critico ? '🔴 ' : '';
-    const fechaRef  = tipo === 'added' ? fmtTs(r.ts) : fmtDate(r.ts_norm);
-    const labelFecha = tipo === 'added' ? 'Registrado' : 'F.Norm.';
-    return `<div class="mov-card ${tipo}-card ${r.critico?'critico-card':''}">
-      <div class="mov-card-tag">${esCritico}${r.tag||'—'}</div>
-      <div class="mov-card-info">
-        <div>${r.desc||'—'} ${r.equipo?'<span style="color:var(--text2)">· '+r.equipo+'</span>':''}</div>
-        <div class="mov-card-meta">
-          ${r.area||'—'} · ${r.disciplina||'—'} · ${r.causa||'—'}
-          ${tipo==='removed' && r.resp_norm ? ' · Resp.Norm: <strong>'+r.resp_norm+'</strong>' : ''}
-          ${tipo==='removed' && r.aviso_ot  ? ' · OT: '+r.aviso_ot : ''}
-        </div>
-        <div class="mov-card-meta" style="color:var(--text2)">
-          Autorizador: ${r.responsable||'—'} · Solicitante: ${r.operador||'—'}
-        </div>
-      </div>
-      <div class="mov-card-state">
-        <span class="badge ${bc}">${r.estado}</span>
-        <div style="font-size:10px;color:var(--text2);margin-top:4px">${labelFecha}: ${fechaRef}</div>
-      </div>
-    </div>`;
-  }).join('');
+async function loadMovimientos(){
+  const sel = document.getElementById('mov-sel-semana');
+  const key = sel?.value || movSemanaActual;
+  movSemanaActual = key;
+  if(!fbReady){ renderMovTablas(key); return; }
+  const { db, doc, getDoc } = window._fb;
+  try {
+    const snap = await getDoc(doc(db,'_movimientos', key));
+    movData[key] = snap.exists() ? snap.data() : { agregados:[], retirados:[] };
+    if(!movData[key].agregados)  movData[key].agregados  = [];
+    if(!movData[key].retirados)  movData[key].retirados  = [];
+  } catch(e){ movData[key] = { agregados:[], retirados:[] }; }
+  renderMovTablas(key);
+}
+
+async function saveMovData(){
+  const key = movSemanaActual;
+  if(!fbReady) return;
+  const { db, doc, setDoc } = window._fb;
+  try {
+    await setDoc(doc(db,'_movimientos', key), movData[key]);
+    document.getElementById('mov-status').textContent = 'Guardado ✓ ' + new Date().toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'});
+  } catch(e){ toast('Error al guardar: '+e.message,'var(--red)') }
+}
+
+function renderMovTablas(key){
+  const data = movData[key] || { agregados:[], retirados:[] };
+  const agr  = data.agregados  || [];
+  const ret  = data.retirados  || [];
+
+  document.getElementById('mov-cnt-agr').textContent = agr.length;
+  document.getElementById('mov-cnt-ret').textContent = ret.length;
+
+  const renderTabla = (tbody, emptyId, lista, tipo) => {
+    const color = tipo === 'agregado' ? 'var(--blue)' : '#9b59b6';
+    if(!lista.length){
+      tbody.innerHTML = '';
+      document.getElementById(emptyId).style.display = 'block';
+      return;
+    }
+    document.getElementById(emptyId).style.display = 'none';
+    tbody.innerHTML = lista.map((r,i) => `<tr>
+      <td>${r.solicitante||'—'}</td>
+      <td>${r.autorizador||'—'}</td>
+      <td>${r.responsable||'—'}</td>
+      <td title="${r.descripcion||''}" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.descripcion||'—'}</td>
+      <td>${r.area||'—'}</td>
+      <td style="font-family:var(--mono);font-size:10px">${r.equipo||'—'}</td>
+      <td class="td-tag" style="color:${color};font-family:var(--mono);font-size:11px;font-weight:700">${r.tag||'—'}</td>
+      <td style="color:var(--cyan)">${r.disciplina||'—'}</td>
+      ${isEditor ? `<td style="white-space:nowrap">
+        <button class="act-btn" style="color:var(--blue);font-size:15px;padding:4px 8px" onclick="editMovimiento('${tipo}',${i})">✎</button>
+        <button class="act-btn" style="color:var(--red);font-size:15px;padding:4px 8px" onclick="deleteMovimiento('${tipo}',${i})">✕</button>
+      </td>` : ''}
+    </tr>`).join('');
+  };
+
+  renderTabla(document.getElementById('mov-body-agr'), 'mov-empty-agr', agr, 'agregado');
+  renderTabla(document.getElementById('mov-body-ret'), 'mov-empty-ret', ret, 'retirado');
+
+  // Mostrar/ocultar botones y columna ACC según rol
+  ['btn-mov-new','btn-mov-ret'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.style.display = isEditor ? '' : 'none';
+  });
+  ['mov-acc-head-agr','mov-acc-head-ret'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.style.display = isEditor ? '' : 'none';
+  });
+}
+
+function openMovModal(tipo, editIdx = null){
+  if(!isEditor){ toast('Se requiere modo EDITOR','var(--red)'); return }
+  document.getElementById('mov-tipo-hidden').value = tipo;
+  document.getElementById('mov-edit-id').value     = editIdx !== null ? editIdx : '';
+  document.getElementById('mov-modal-title').innerHTML =
+    `${tipo==='agregado'?'▲ NUEVO AGREGADO':'▼ NUEVO RETIRADO'} <span>${tipo.toUpperCase()}</span>`;
+
+  // Poblar selects con listas de config
+  const selA = document.getElementById('mov-area');
+  selA.innerHTML = '<option value="">— Seleccionar —</option>' +
+    (cfgLists.areas||[]).map(a=>`<option>${a}</option>`).join('');
+  const selD = document.getElementById('mov-disc');
+  selD.innerHTML = '<option value="">— Seleccionar —</option>' +
+    (cfgLists.disciplinas||[]).map(d=>`<option>${d}</option>`).join('');
+
+  // Cargar datos si es edición
+  if(editIdx !== null){
+    const lista = tipo==='agregado' ? movData[movSemanaActual].agregados : movData[movSemanaActual].retirados;
+    const r = lista[editIdx];
+    document.getElementById('mov-solicitante').value  = r.solicitante  || '';
+    document.getElementById('mov-autorizador').value  = r.autorizador  || '';
+    document.getElementById('mov-responsable').value  = r.responsable  || '';
+    document.getElementById('mov-descripcion').value  = r.descripcion  || '';
+    document.getElementById('mov-area').value         = r.area         || '';
+    document.getElementById('mov-equipo').value       = r.equipo       || '';
+    document.getElementById('mov-tag').value          = r.tag          || '';
+    document.getElementById('mov-disc').value         = r.disciplina   || '';
+  } else {
+    ['mov-solicitante','mov-autorizador','mov-responsable','mov-descripcion','mov-equipo','mov-tag']
+      .forEach(id => document.getElementById(id).value = '');
+    document.getElementById('mov-area').value = '';
+    document.getElementById('mov-disc').value = '';
+  }
+  document.getElementById('modal-mov').classList.add('open');
+}
+
+function closeMovModal(){
+  document.getElementById('modal-mov').classList.remove('open');
+}
+
+async function saveMovimiento(){
+  const tipo   = document.getElementById('mov-tipo-hidden').value;
+  const editIdx= document.getElementById('mov-edit-id').value;
+  const tag    = document.getElementById('mov-tag').value.trim();
+  const desc   = document.getElementById('mov-descripcion').value.trim();
+  if(!tag)  { toast('TAG es obligatorio','var(--red)'); return }
+  if(!desc) { toast('Descripción es obligatoria','var(--red)'); return }
+
+  const reg = {
+    solicitante:  document.getElementById('mov-solicitante').value.trim(),
+    autorizador:  document.getElementById('mov-autorizador').value.trim(),
+    responsable:  document.getElementById('mov-responsable').value.trim(),
+    descripcion:  desc,
+    area:         document.getElementById('mov-area').value,
+    equipo:       document.getElementById('mov-equipo').value.trim(),
+    tag,
+    disciplina:   document.getElementById('mov-disc').value,
+  };
+
+  const key   = movSemanaActual;
+  if(!movData[key]) movData[key] = { agregados:[], retirados:[] };
+  const lista = tipo==='agregado' ? movData[key].agregados : movData[key].retirados;
+
+  if(editIdx !== ''){
+    lista[parseInt(editIdx)] = reg;
+    toast('Registro actualizado ✓');
+  } else {
+    lista.push(reg);
+    toast('Registro guardado ✓');
+  }
+
+  await saveMovData();
+  closeMovModal();
+  renderMovTablas(key);
+}
+
+function editMovimiento(tipo, idx){
+  openMovModal(tipo, idx);
+}
+
+async function deleteMovimiento(tipo, idx){
+  const key = movSemanaActual;
+  const lista = tipo==='agregado' ? movData[key].agregados : movData[key].retirados;
+  lista.splice(idx,1);
+  await saveMovData();
+  renderMovTablas(key);
+  toast('Eliminado','var(--red)');
+}
+
+function renderMovimientos(){
+  buildMovSemanaSelector();
+  loadMovimientos();
 }
 
 // ── Export ─────────────────────────────────────────────
